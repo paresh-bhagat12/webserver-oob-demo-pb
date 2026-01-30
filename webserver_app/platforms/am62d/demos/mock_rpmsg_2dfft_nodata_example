@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Mock 2D FFT No-Data Demo - simulates the real rpmsg_2dfft_nodata_example output
+echo "RPMsg based 2D FFT Offload Example (No Data Transfer)"
+echo "*****************************************"
+echo "Starting parameter-only demo..."
+sleep 0.5
+
+echo "Loading firmware..."
+sleep 0.3
+
+echo "Sending parameters to DSP..."
+sleep 0.2
+
+echo "C7x Load: 25%"
+echo "C7x Cycle Count: 5432100"
+
+# Simulate success
+echo "*****************************************"
+echo "C7x 2DFFT Test PASSED"
+echo "*****************************************"
+exit 0

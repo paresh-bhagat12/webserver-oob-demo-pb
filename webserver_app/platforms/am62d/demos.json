@@ -23,6 +23,26 @@
         "show_metrics": true,
         "display_pass_fail": true
       }
+    },
+    {
+      "id": "2dfft_nodata",
+      "name": "2D FFT Lightweight",
+      "description": "Parameter-only 2D FFT demo without data transfer (faster startup)",
+      "type": "batch",
+      "category": "dsp_offload",
+      "executable": "demos/mock_rpmsg_2dfft_nodata_example",
+      "timeout": 8000,
+      "expected_duration": "~1.5 seconds",
+      "output_format": "structured",
+      "firmware": "/lib/firmware/fft2d_linux_dsp_offload_example.c75ss0-0.release.strip.out",
+      "metrics": ["status", "dsp_load", "cycle_count"],
+      "ui": {
+        "icon": "calculator",
+        "color": "cyan",
+        "show_logs": true,
+        "show_metrics": true,
+        "display_pass_fail": true
+      }
     }
   ]
 }
