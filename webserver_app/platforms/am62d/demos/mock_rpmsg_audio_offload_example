@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Mock Audio Offload Demo - simulates streaming output
+echo "Network interface enabled - 4 TCP ports:"
+echo "  LOG_PORT (8888):      Frame-by-frame metrics"
+echo "  CMD_PORT (8889):      Control commands"
+echo "  INDATA_PORT (8890):   Raw audio input"
+echo "  OUTDATA_PORT (8891):  Raw audio output"
+echo ""
+
+frame=1
+while true; do
+    # Simulate frame processing
+    latency=$(echo "scale=1; 1.0 + $RANDOM % 10 / 10.0" | bc -l)
+    cpu_load=$((10 + $RANDOM % 20))
+    dsp_load=$((60 + $RANDOM % 30))
+
+    echo "Frame $frame: AvgAmp=256.5, Latency=${latency}ms, Mode=DSP, CPULoad=${cpu_load}%, DSPLoad=${dsp_load}%"
+
+    # Every 10 frames, show summary
+    if [ $((frame % 10)) -eq 0 ]; then
+        echo "[Live Summary] Frames: $frame"
+        echo "[Live Summary] Latency (ms): Min: 1.1, Max: 1.9, Avg: 1.4"
+        echo "[Live Summary] CPU Load (%): Min: 10.0, Max: 30.0, Avg: 20.0"
+        echo "[Live Summary] DSP Load (%): Min: 60.0, Max: 90.0, Avg: 75.0"
+        echo ""
+    fi
+
+    frame=$((frame + 1))
+    sleep 0.1
+
+    # Stop after 100 frames for demo purposes
+    if [ $frame -gt 100 ]; then
+        break
+    fi
+done
+
+echo "Audio offload demo completed"
+exit 0

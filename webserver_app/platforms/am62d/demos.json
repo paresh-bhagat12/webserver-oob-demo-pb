@@ -43,6 +43,37 @@
         "show_metrics": true,
         "display_pass_fail": true
       }
+    },
+    {
+      "id": "audio_offload",
+      "name": "Audio DSP Offload",
+      "description": "Real-time 8-channel audio processing with FFT-based filtering on C7x DSP",
+      "type": "streaming",
+      "category": "dsp_offload",
+      "executable": "demos/mock_rpmsg_audio_offload_example",
+      "config_file": "/etc/dsp_offload.cfg",
+      "sample_audio": "/usr/share/audio_sample/sample_audio.wav",
+      "firmware": "/lib/firmware/dsp_audio_filter_offload.c75ss0-0.release.strip.out",
+      "ports": {
+        "log": 8888,
+        "cmd": 8889,
+        "in_data": 8890,
+        "out_data": 8891
+      },
+      "metrics": ["frame_count", "latency_ms", "cpu_load", "dsp_load", "amplitude", "filter_state", "exec_mode"],
+      "controls": {
+        "filter_enable": "SET FFT FILTER",
+        "mode_switch": "SET EXEC MODE",
+        "uart_interface": "SET HOST INTERFACE"
+      },
+      "ui": {
+        "icon": "volume-up",
+        "color": "green",
+        "real_time": true,
+        "charts": ["latency", "cpu_load", "dsp_load"],
+        "show_controls": true,
+        "show_network_interface": true
+      }
     }
   ]
 }
