@@ -1,3 +1,28 @@
 {
-  "demos": []
+  "demos": [
+    {
+      "id": "2dfft",
+      "name": "2D FFT Benchmark",
+      "description": "128x128 2D FFT computation with output verification using C7x DSP",
+      "type": "batch",
+      "category": "dsp_offload",
+      "executable": "demos/mock_rpmsg_2dfft_example",
+      "timeout": 10000,
+      "expected_duration": "~2 seconds",
+      "output_format": "structured",
+      "test_data": {
+        "input": "/usr/share/2dfft_test_data/2dfft_input_data.bin",
+        "expected": "/usr/share/2dfft_test_data/2dfft_expected_output_data.bin"
+      },
+      "firmware": "/lib/firmware/fft2d_linux_dsp_offload_example.c75ss0-0.release.strip.out",
+      "metrics": ["status", "dsp_load", "cycle_count", "ddr_throughput"],
+      "ui": {
+        "icon": "calculator",
+        "color": "blue",
+        "show_logs": true,
+        "show_metrics": true,
+        "display_pass_fail": true
+      }
+    }
+  ]
 }

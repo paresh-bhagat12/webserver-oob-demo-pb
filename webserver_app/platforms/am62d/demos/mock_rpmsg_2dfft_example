@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Mock 2D FFT Demo - simulates the real rpmsg_2dfft_example output
+echo "RPMsg based 2D FFT Offload Example"
+echo "*****************************************"
+echo "Starting 2D FFT computation..."
+sleep 1
+
+echo "Loading firmware..."
+sleep 0.5
+
+echo "Initializing DMA buffers..."
+sleep 0.5
+
+echo "Starting C7x DSP computation..."
+sleep 1
+
+echo "C7x Load: 45%"
+echo "C7x Cycle Count: 12345678"
+echo "C7x DDR Throughput: 2048.5 MB/s"
+
+# Simulate success
+if [ "${1}" = "fail" ]; then
+    echo "*****************************************"
+    echo "C7x 2DFFT Test FAILED"
+    echo "*****************************************"
+    exit 1
+else
+    echo "*****************************************"
+    echo "C7x 2DFFT Test PASSED"
+    echo "*****************************************"
+    exit 0
+fi
