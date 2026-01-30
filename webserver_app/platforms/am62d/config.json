@@ -1,0 +1,60 @@
+{
+  "platform": {
+    "id": "am62d",
+    "name": "AM62d Evaluation Module",
+    "description": "Comprehensive development platform for AM62d processors with integrated DSP capabilities",
+    "processor": "AM62d",
+    "architecture": "aarch64"
+  },
+  "ui": {
+    "title": "AM62d Demo",
+    "product_name": "AM62d Demo",
+    "board_label": "AM62D",
+    "board_images": [
+      {
+        "name": "AM62d EVM",
+        "path": "assets/am62d-evm-angled.png",
+        "description": "AM62d Evaluation Module: Advanced development platform with DSP offloading capabilities"
+      }
+    ]
+  },
+  "documentation": [
+    {
+      "title": "AM62d Product Page",
+      "url": "https://www.ti.com/product/AM62d",
+      "type": "product",
+      "icon": "ti-ic-productfolder-lg"
+    },
+    {
+      "title": "AM62d Technical Reference Manual",
+      "url": "https://www.ti.com/lit/pdf/spruiv7",
+      "type": "technical",
+      "icon": "ti-ic-archive-lg"
+    },
+    {
+      "title": "Processor SDK AM62d",
+      "url": "https://www.ti.com/tool/PROCESSOR-SDK-AM62X",
+      "type": "sdk",
+      "icon": "ti-ic-download-lg"
+    },
+    {
+      "title": "AM62d Linux Documentation",
+      "url": "https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/latest/exports/docs/",
+      "type": "documentation",
+      "icon": "ti-ic-archive-lg"
+    },
+    {
+      "title": "RPMsg DSP Offloading Guide",
+      "url": "https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/latest/exports/docs/linux/Foundational_Components/IPC/",
+      "type": "documentation",
+      "icon": "ti-ic-archive-lg"
+    },
+    {
+      "title": "E2E Support Forums",
+      "url": "https://e2e.ti.com/support/processors/f/processors-forum",
+      "type": "support",
+      "icon": "ti-ic-community-lg"
+    }
+  ],
+  "features": ["system_info", "dsp_demos", "cpu_monitoring"]
+}
