@@ -2079,6 +2079,174 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         .dot.active, .dot:hover {
             background-color: #717171;
         }
+
+        /* Demo Cards Styles */
+        .demo-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .demo-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .demo-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .demo-card-icon.blue { background: linear-gradient(135deg, #1E88E5, #1565C0); }
+        .demo-card-icon.green { background: linear-gradient(135deg, #43A047, #2E7D32); }
+        .demo-card-icon.orange { background: linear-gradient(135deg, #FB8C00, #E65100); }
+        .demo-card-icon.cyan { background: linear-gradient(135deg, #00ACC1, #00838F); }
+
+        .demo-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+
+        .demo-card-category {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .demo-card-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .demo-card-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .demo-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .demo-btn-primary {
+            background-color: #148C9C;
+            color: white;
+        }
+
+        .demo-btn-primary:hover {
+            background-color: #0f6b77;
+        }
+
+        .demo-btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .demo-btn-secondary:hover {
+            background-color: #e8e8e8;
+        }
+
+        .demo-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .demo-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .demo-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .demo-status-dot.idle { background-color: #ccc; }
+        .demo-status-dot.running { background-color: #4CAF50; }
+        .demo-status-dot.complete { background-color: #2196F3; }
+        .demo-status-dot.error { background-color: #f44336; }
+
+        .demo-output {
+            background-color: #f8f8f8;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .demo-output.visible {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .demo-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .demo-metric {
+            text-align: center;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .demo-metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .demo-metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
     </style>
 
 <ti-widget-readme background-color="#ffffff" elevation="5" title-text="README.md" id="readmeViewer" pin></ti-widget-readme>
@@ -2133,6 +2301,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     <ti-widget-container id="ti_widget_container_greybar" font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" visible title horizontal layout center-justified center>
                     </ti-widget-container>
                     <ti-widget-app-menu-buttons id="ti_widget_app_menu_buttons" background-color="#ffffff" icon-color="#148C9C" selected-index="0" title></ti-widget-app-menu-buttons>
+
+                    <!-- Dynamic Demo Cards Section -->
+                    <div id="platform-demos-section" style="margin-top: 20px; padding: 20px;">
+                        <h3 style="color: #148C9C; text-align: center; margin-bottom: 20px;">Platform Demos</h3>
+                        <div id="demo-cards-container" class="demo-cards-grid">
+                            <!-- Demo cards will be populated dynamically -->
+                        </div>
+                    </div>
                 </ti-widget-container>
             </ti-widget-tab>
         </ti-widget-tabcontainer>

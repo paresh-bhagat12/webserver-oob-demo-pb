@@ -57,6 +57,292 @@ function updatePlatformUI() {
     console.log('Platform UI updated for:', platformConfig.platform.name);
 }
 
+// Demo management functions
+var demoStates = {}; // Track state of each demo
+var demoSockets = {}; // WebSocket connections per demo
+
+// Create demo cards UI
+function createDemoCards() {
+    if (!demosConfig || !demosConfig.demos) return;
+
+    const container = document.getElementById('demo-cards-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    demosConfig.demos.forEach(demo => {
+        demoStates[demo.id] = { status: 'idle', output: '', metrics: {} };
+
+        const card = document.createElement('div');
+        card.className = 'demo-card';
+        card.innerHTML = `
+            <div class="demo-card-header">
+                <div class="demo-card-icon ${demo.ui.color}">
+                    ${getIconSymbol(demo.ui.icon)}
+                </div>
+                <div>
+                    <h3 class="demo-card-title">${demo.name}</h3>
+                    <div class="demo-card-category">${demo.category || 'demo'}</div>
+                </div>
+            </div>
+            <p class="demo-card-description">${demo.description}</p>
+
+            <div class="demo-status" id="status-${demo.id}">
+                <div class="demo-status-dot idle"></div>
+                <span>Ready</span>
+            </div>
+
+            <div class="demo-card-controls">
+                <button class="demo-btn demo-btn-primary" onclick="runDemo('${demo.id}')" id="run-btn-${demo.id}">
+                    ${demo.type === 'streaming' ? 'Start' : 'Run'}
+                </button>
+                ${demo.type === 'streaming' ? `<button class="demo-btn demo-btn-secondary" onclick="stopDemo('${demo.id}')" id="stop-btn-${demo.id}" disabled>Stop</button>` : ''}
+                ${demo.ui.show_logs ? `<button class="demo-btn demo-btn-secondary" onclick="toggleOutput('${demo.id}')" id="toggle-btn-${demo.id}">Show Output</button>` : ''}
+            </div>
+
+            ${demo.ui.show_logs ? `<div class="demo-output" id="output-${demo.id}"></div>` : ''}
+
+            ${demo.ui.show_metrics ? `
+                <div class="demo-metrics" id="metrics-${demo.id}">
+                    ${demo.metrics.map(metric => `
+                        <div class="demo-metric">
+                            <div class="demo-metric-label">${metric.toUpperCase()}</div>
+                            <div class="demo-metric-value" id="metric-${demo.id}-${metric}">--</div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        `;
+
+        container.appendChild(card);
+    });
+
+    console.log('Demo cards created for', demosConfig.demos.length, 'demos');
+}
+
+// Get icon symbol for demo card
+function getIconSymbol(icon) {
+    const icons = {
+        'calculator': '📊',
+        'volume-up': '🔊',
+        'sliders': '🎛️',
+        'activity': '⚡',
+        'cpu': '🖥️'
+    };
+    return icons[icon] || '▶️';
+}
+
+// Run a demo
+function runDemo(demoId) {
+    console.log('Running demo:', demoId);
+
+    const demo = demosConfig.demos.find(d => d.id === demoId);
+    if (!demo) return;
+
+    updateDemoStatus(demoId, 'running', demo.type === 'streaming' ? 'Streaming...' : 'Running...');
+
+    // Disable run button, enable stop button if streaming
+    const runBtn = document.getElementById(`run-btn-${demoId}`);
+    const stopBtn = document.getElementById(`stop-btn-${demoId}`);
+
+    if (runBtn) runBtn.disabled = true;
+    if (stopBtn) stopBtn.disabled = false;
+
+    // Clear previous output
+    clearDemoOutput(demoId);
+
+    // Start demo via API
+    fetch(`/api/demos/${demoId}/start`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (demo.type === 'streaming') {
+                    connectDemoWebSocket(demoId);
+                } else {
+                    // For batch demos, poll for completion
+                    pollDemoCompletion(demoId);
+                }
+            } else {
+                updateDemoStatus(demoId, 'error', 'Failed to start');
+                resetDemoButtons(demoId);
+            }
+        })
+        .catch(error => {
+            console.error('Error starting demo:', error);
+            updateDemoStatus(demoId, 'error', 'Connection error');
+            resetDemoButtons(demoId);
+        });
+}
+
+// Stop a streaming demo
+function stopDemo(demoId) {
+    console.log('Stopping demo:', demoId);
+
+    fetch(`/api/demos/${demoId}/stop`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            updateDemoStatus(demoId, 'idle', 'Stopped');
+            resetDemoButtons(demoId);
+
+            if (demoSockets[demoId]) {
+                demoSockets[demoId].close();
+                delete demoSockets[demoId];
+            }
+        })
+        .catch(error => {
+            console.error('Error stopping demo:', error);
+        });
+}
+
+// Connect to demo WebSocket for real-time output
+function connectDemoWebSocket(demoId) {
+    const wsUrl = `ws://${window.location.host}/demo/${demoId}`;
+    const socket = new WebSocket(wsUrl);
+
+    demoSockets[demoId] = socket;
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'output') {
+            appendDemoOutput(demoId, data.data);
+        } else if (data.type === 'metrics') {
+            updateDemoMetrics(demoId, data.data);
+        } else if (data.type === 'complete') {
+            updateDemoStatus(demoId, 'complete', 'Completed');
+            resetDemoButtons(demoId);
+            socket.close();
+            delete demoSockets[demoId];
+        } else if (data.type === 'error') {
+            updateDemoStatus(demoId, 'error', 'Error occurred');
+            resetDemoButtons(demoId);
+        }
+    };
+
+    socket.onerror = function(error) {
+        console.error('WebSocket error for demo', demoId, error);
+        updateDemoStatus(demoId, 'error', 'Connection lost');
+        resetDemoButtons(demoId);
+    };
+}
+
+// Poll for batch demo completion
+function pollDemoCompletion(demoId) {
+    const pollInterval = setInterval(() => {
+        fetch(`/api/demos/${demoId}/status`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.output) {
+                    setDemoOutput(demoId, data.output);
+                }
+
+                if (data.metrics) {
+                    updateDemoMetrics(demoId, data.metrics);
+                }
+
+                if (data.status === 'complete') {
+                    updateDemoStatus(demoId, 'complete', 'Completed');
+                    resetDemoButtons(demoId);
+                    clearInterval(pollInterval);
+                } else if (data.status === 'error') {
+                    updateDemoStatus(demoId, 'error', 'Failed');
+                    resetDemoButtons(demoId);
+                    clearInterval(pollInterval);
+                }
+            })
+            .catch(error => {
+                console.error('Error polling demo status:', error);
+                clearInterval(pollInterval);
+            });
+    }, 1000);
+
+    // Stop polling after 2 minutes to prevent runaway polling
+    setTimeout(() => clearInterval(pollInterval), 120000);
+}
+
+// Update demo status indicator
+function updateDemoStatus(demoId, status, message) {
+    const statusEl = document.getElementById(`status-${demoId}`);
+    if (!statusEl) return;
+
+    const dot = statusEl.querySelector('.demo-status-dot');
+    const span = statusEl.querySelector('span');
+
+    if (dot) {
+        dot.className = `demo-status-dot ${status}`;
+    }
+    if (span) {
+        span.textContent = message;
+    }
+
+    demoStates[demoId].status = status;
+}
+
+// Reset demo control buttons
+function resetDemoButtons(demoId) {
+    const runBtn = document.getElementById(`run-btn-${demoId}`);
+    const stopBtn = document.getElementById(`stop-btn-${demoId}`);
+
+    if (runBtn) runBtn.disabled = false;
+    if (stopBtn) stopBtn.disabled = true;
+}
+
+// Toggle demo output visibility
+function toggleOutput(demoId) {
+    const output = document.getElementById(`output-${demoId}`);
+    const toggleBtn = document.getElementById(`toggle-btn-${demoId}`);
+
+    if (!output || !toggleBtn) return;
+
+    if (output.classList.contains('visible')) {
+        output.classList.remove('visible');
+        toggleBtn.textContent = 'Show Output';
+    } else {
+        output.classList.add('visible');
+        toggleBtn.textContent = 'Hide Output';
+    }
+}
+
+// Append new output to demo output area
+function appendDemoOutput(demoId, text) {
+    const output = document.getElementById(`output-${demoId}`);
+    if (!output) return;
+
+    demoStates[demoId].output += text + '\n';
+    output.textContent = demoStates[demoId].output;
+    output.scrollTop = output.scrollHeight;
+}
+
+// Set complete demo output (for batch demos)
+function setDemoOutput(demoId, text) {
+    const output = document.getElementById(`output-${demoId}`);
+    if (!output) return;
+
+    demoStates[demoId].output = text;
+    output.textContent = text;
+}
+
+// Clear demo output
+function clearDemoOutput(demoId) {
+    const output = document.getElementById(`output-${demoId}`);
+    if (output) {
+        output.textContent = '';
+    }
+    demoStates[demoId].output = '';
+}
+
+// Update demo metrics display
+function updateDemoMetrics(demoId, metrics) {
+    Object.keys(metrics).forEach(key => {
+        const metricEl = document.getElementById(`metric-${demoId}-${key}`);
+        if (metricEl) {
+            metricEl.textContent = metrics[key];
+        }
+    });
+
+    demoStates[demoId].metrics = { ...demoStates[demoId].metrics, ...metrics };
+}
+
 /*
  *  Boilerplate code for creating computed data bindings
  */
@@ -131,6 +417,9 @@ var init = function() {
             console.log("Application template has been stamped.");
             templateObj.$.ti_widget_toast.hideToast();
             templateObj.$.ti_widget_eventlog_view.log("info", "Application started.");
+
+            // Create platform demo cards
+            createDemoCards();
 
             // Expand vtabcontainer nav bar when user clicks on menu icon or 'Menu' label
             templateObj.toggleMenu = function(event){
