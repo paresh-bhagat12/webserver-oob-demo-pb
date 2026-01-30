@@ -74,6 +74,28 @@
         "show_controls": true,
         "show_network_interface": true
       }
+    },
+    {
+      "id": "audio_control",
+      "name": "Audio Control Demo",
+      "description": "DSP parameter control demonstration without audio streaming",
+      "type": "streaming",
+      "category": "dsp_offload",
+      "executable": "demos/rpmsg_audio_control_example",
+      "config_file": "/etc/dsp_offload.cfg",
+      "firmware": "/lib/firmware/dsp_audio_filter_offload.c75ss0-0.release.strip.out",
+      "metrics": ["frame_count", "latency_ms", "cpu_load", "dsp_load", "control_params"],
+      "controls": {
+        "param_control": "SET PARAM",
+        "mode_switch": "SET EXEC MODE"
+      },
+      "ui": {
+        "icon": "sliders",
+        "color": "orange",
+        "real_time": true,
+        "charts": ["latency", "cpu_load", "dsp_load"],
+        "show_controls": true
+      }
     }
   ]
 }
