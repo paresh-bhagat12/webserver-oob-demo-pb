@@ -6,6 +6,58 @@ var gc = gc || {};
 gc.services = gc.services || {};
 
 /*
+ * Platform Configuration System
+ * Dynamically loads platform-specific configuration from server
+ */
+var platformConfig = null;
+var demosConfig = null;
+
+// Load platform configuration from server
+function loadPlatformConfiguration() {
+    return Promise.all([
+        fetch('/api/platform').then(response => response.json()),
+        fetch('/api/demos').then(response => response.json())
+    ]).then(([platform, demos]) => {
+        platformConfig = platform;
+        demosConfig = demos;
+        console.log('Platform configuration loaded:', platformConfig.platform.name);
+        console.log('Demos configuration loaded:', demosConfig.demos.length + ' demos');
+        return { platform: platformConfig, demos: demosConfig };
+    }).catch(error => {
+        console.error('Failed to load platform configuration:', error);
+        // Fallback to default AM335x configuration
+        platformConfig = {
+            platform: { id: 'am335x', name: 'AM335x Demo', processor: 'AM335x' },
+            ui: { title: 'AM335x Demo', product_name: 'AM335x Demo', board_label: 'AM335X' }
+        };
+        demosConfig = { demos: [] };
+        return { platform: platformConfig, demos: demosConfig };
+    });
+}
+
+// Update UI elements with platform-specific content
+function updatePlatformUI() {
+    if (!platformConfig) return;
+
+    // Update page title
+    document.title = platformConfig.ui.title;
+
+    // Update menubar product name
+    const menubar = document.querySelector('#ti_widget_menubar');
+    if (menubar) {
+        menubar.setAttribute('product-name', platformConfig.ui.product_name);
+    }
+
+    // Update product label
+    const productLabel = document.querySelector('#ti_widget_label_productname');
+    if (productLabel) {
+        productLabel.setAttribute('label', platformConfig.ui.board_label);
+    }
+
+    console.log('Platform UI updated for:', platformConfig.platform.name);
+}
+
+/*
  *  Boilerplate code for creating computed data bindings
  */
 document.addEventListener('gc-databind-ready', function() {
@@ -61,14 +113,20 @@ var templateObj;
 // Wait for DOMContentLoaded event before trying to access the application template
 var init = function() {
     console.log("init() function called.");
-    templateObj = document.querySelector('#template_obj');
-    console.log("templateObj after querySelector:", templateObj);
 
-    // Wait for the template to fire a dom-change event to indicate that it has been 'stamped'
-    // before trying to access components in the application.
-    templateObj.addEventListener('dom-change', function() {
-        if (initComplete) return;
-        this.async(function() {
+    // Load platform configuration first
+    loadPlatformConfiguration().then(function() {
+        templateObj = document.querySelector('#template_obj');
+        console.log("templateObj after querySelector:", templateObj);
+
+        // Update platform-specific UI elements
+        updatePlatformUI();
+
+        // Wait for the template to fire a dom-change event to indicate that it has been 'stamped'
+        // before trying to access components in the application.
+        templateObj.addEventListener('dom-change', function() {
+            if (initComplete) return;
+            this.async(function() {
             initComplete = true;
             console.log("Application template has been stamped.");
             templateObj.$.ti_widget_toast.hideToast();
@@ -832,8 +890,18 @@ var init = function() {
             setInterval(updateCpuLoad, 1000);
             updateCpuLoad();
 
-        }, 1);
+            }, 1);
 
+        });
+    }).catch(function(error) {
+        console.error('Platform configuration failed, continuing with defaults:', error);
+        // Continue with default behavior even if platform config fails
+        templateObj = document.querySelector('#template_obj');
+        if (templateObj) {
+            templateObj.addEventListener('dom-change', function() {
+                console.log('Fallback initialization completed');
+            });
+        }
     });
 };
 
