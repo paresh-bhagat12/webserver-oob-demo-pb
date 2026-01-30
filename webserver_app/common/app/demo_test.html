@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Demo Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-card { border: 1px solid #ccc; padding: 15px; margin: 10px; border-radius: 5px; }
+        .demo-status { padding: 10px; background: #f0f0f0; margin: 10px 0; }
+        .demo-output { background: #000; color: #0f0; padding: 10px; font-family: monospace; height: 300px; overflow-y: scroll; }
+        button { padding: 10px 15px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Platform Demo Test</h1>
+
+    <div id="platform-info">
+        <h2>Platform Information</h2>
+        <div id="platform-details">Loading...</div>
+    </div>
+
+    <div id="demo-list">
+        <h2>Available Demos</h2>
+        <div id="demos-container">Loading...</div>
+    </div>
+
+    <div id="demo-status">
+        <h2>Demo Status</h2>
+        <div id="status-container">Idle</div>
+    </div>
+
+    <div id="demo-output">
+        <h2>Demo Output</h2>
+        <pre id="output-container" class="demo-output"></pre>
+    </div>
+
+    <script>
+        let ws = null;
+
+        // Load platform info
+        async function loadPlatformInfo() {
+            try {
+                const response = await fetch('/api/platform');
+                const data = await response.json();
+                document.getElementById('platform-details').innerHTML = `
+                    <strong>${data.platform.name}</strong> (${data.platform.id})<br>
+                    ${data.platform.description}<br>
+                    Architecture: ${data.platform.architecture}
+                `;
+            } catch (err) {
+                document.getElementById('platform-details').innerHTML = 'Error loading platform info';
+            }
+        }
+
+        // Load demo list
+        async function loadDemos() {
+            try {
+                const response = await fetch('/api/demos');
+                const data = await response.json();
+                const container = document.getElementById('demos-container');
+
+                container.innerHTML = data.demos.map(demo => `
+                    <div class="demo-card">
+                        <h3>${demo.name}</h3>
+                        <p>${demo.description}</p>
+                        <p><strong>Type:</strong> ${demo.type} | <strong>Duration:</strong> ${demo.expected_duration || 'N/A'}</p>
+                        <button onclick="startDemo('${demo.id}')">Start</button>
+                        <button onclick="stopDemo('${demo.id}')">Stop</button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                document.getElementById('demos-container').innerHTML = 'Error loading demos';
+            }
+        }
+
+        // Start demo
+        async function startDemo(demoId) {
+            try {
+                const response = await fetch(`/api/demos/${demoId}/start`, { method: 'POST' });
+                const data = await response.json();
+                updateStatus(`Started: ${demoId}`);
+                connectWebSocket();
+            } catch (err) {
+                updateStatus(`Error starting ${demoId}: ${err.message}`);
+            }
+        }
+
+        // Stop demo
+        async function stopDemo(demoId) {
+            try {
+                const response = await fetch(`/api/demos/${demoId}/stop`);
+                const data = await response.json();
+                updateStatus(`Stopped: ${demoId}`);
+            } catch (err) {
+                updateStatus(`Error stopping ${demoId}: ${err.message}`);
+            }
+        }
+
+        // Update status
+        function updateStatus(status) {
+            document.getElementById('status-container').innerHTML = status;
+        }
+
+        // Connect WebSocket
+        function connectWebSocket() {
+            if (ws) return;
+
+            ws = new WebSocket(`ws://${window.location.hostname}:${window.location.port}/demos`);
+
+            ws.onopen = function() {
+                updateStatus('WebSocket connected');
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                appendOutput(JSON.stringify(data, null, 2));
+
+                if (data.type === 'completed') {
+                    updateStatus(`Demo completed: ${data.demo}`);
+                    ws = null;
+                }
+            };
+
+            ws.onclose = function() {
+                updateStatus('WebSocket disconnected');
+                ws = null;
+            };
+
+            ws.onerror = function(error) {
+                updateStatus('WebSocket error');
+                ws = null;
+            };
+        }
+
+        // Append output
+        function appendOutput(text) {
+            const container = document.getElementById('output-container');
+            container.textContent += text + '\n';
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Load status periodically
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/demos/status');
+                const data = await response.json();
+                if (data.running) {
+                    updateStatus(`Running: ${data.demo} (${data.status})`);
+                } else {
+                    updateStatus('Idle');
+                }
+            } catch (err) {
+                // Ignore status errors
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            loadPlatformInfo();
+            loadDemos();
+            setInterval(loadStatus, 2000);
+        };
+    </script>
+</body>
+</html>

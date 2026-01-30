@@ -1,0 +1,19 @@
+{
+	"template":"AM335x Demo",
+	"description":"Multipage application",
+	"version":"1.0.0",
+	"theme":"ti-analogevm-theme",
+	"projectName":"AM335x_Demo",
+	"applicationName":"AM335x Demo",
+	"applicationIcon":"",
+	"windowIcon":"",
+	"splashImage":"",
+	"tiBrandingEnabled":true,
+	"disableAutoConnect":false,
+	"vendorName":"",
+	"technologyName":"",
+	"customLicense":"",
+	"customManifest":"",
+	"customAppInfo":"",
+	"nosplash":true
+}

@@ -1,0 +1,21 @@
+{
+  "name": "webserver-generic",
+  "version": "2.0.0",
+  "description": "Generic Platform Webserver with Demo Framework",
+  "main": "webserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node webserver.js",
+    "start:am335x": "PLATFORM=am335x node webserver.js",
+    "start:am62d": "PLATFORM=am62d node webserver.js"
+  },
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^8.14.2"
+  },
+  "private": true,
+  "bin": {
+    "webserver-generic": "webserver.js"
+  }
+}

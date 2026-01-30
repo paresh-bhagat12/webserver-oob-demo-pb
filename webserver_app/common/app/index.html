@@ -1,0 +1,3449 @@
+<!doctype html>
+<!--
+%COPYRIGHTNOTICE%
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+*   Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+*   Neither the name of Texas Instruments Incorporated nor the names of
+its contributors may be used to endorse or promote products derived
+from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <link rel="icon" type="image/png" href="splash/gui_icon.png">
+
+    <title>AM335x Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <script src="components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script> if (typeof nw != 'undefined') {window.$ti_nw_main_window = true;} </script>
+    <script>
+        console.log("window.opener = "+window.opener);
+        if (window.opener) {
+            if (window.opener.getNodeWebkit){
+                window.opener.getNodeWebkit(window,window.opener);
+            }
+        }
+        console.log("typeof process = "+(typeof process).toString());
+    </script>
+    <script src="components/ti-core-assets/scripts/gcDesktop.js"></script>
+    <link rel="import" href="components/ti-core-databind/ti-core-databind.html">
+    <script src="main.js"></script>
+    <link rel="stylesheet" href="oneui.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener('WebComponentsReady', function() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.dot');
+            let currentSlide = 0;
+            let slideInterval;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    dots[i].classList.remove('active');
+                });
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentSlide = index;
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            function startSlideShow() {
+                slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+            }
+
+            function stopSlideShow() {
+                clearInterval(slideInterval);
+            }
+
+            // Event listeners for dots
+            dots.forEach(dot => {
+                dot.addEventListener('click', (event) => {
+                    stopSlideShow();
+                    showSlide(parseInt(event.target.dataset.slide));
+                    startSlideShow();
+                });
+            });
+
+            showSlide(currentSlide);
+            startSlideShow();
+        });
+    </script>
+    <script type = "text/javascript" src = "jquery-3.5.1.min.js"></script>
+    <script type = "text/javascript" language = "javascript">
+         $(function() {
+            function update_data() {
+                // This function will be adapted for uname data
+            }
+            // setInterval(update_data, 1000); // No auto-update for uname
+            // update_data();
+           });
+    </script>
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            height: 100%;
+            overflow-y: hidden;
+        }
+
+        design-gist-element-preview {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body class="ti-analogevm-theme">
+<div id="splash" style='width:100%; height:100%; z-index: 999999; background-color: #eeeeee; position: absolute;'>
+	<div style="width: 100%; height: 100%; background: url('./images/loading.gif') no-repeat center"></div>
+</div>
+
+<!-- ------------------------------------------------------------------------------------- -->
+<!--gist-begin-->
+<link rel="import" href="components/ti-widget-readme/ti-widget-readme.html">
+<link rel="import" href="components/ti-core-stylesheets/ti-core-stylesheets.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-menubar.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-filemenu.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-menuaction.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-optionsmenu.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-menuitem.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-zoommenu.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-helpmenu.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-menutoggle.html">
+<link rel="import" href="components/ti-widget-menubar/ti-widget-menuseparator.html">
+<link rel="import" href="components/ti-widget-window-buttons/ti-widget-window-buttons.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-container.html">
+<link rel="import" href="components/ti-widget-icon-button/ti-widget-icon-button.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-icon.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-label.html">
+<link rel="import" href="components/ti-widget-toast/ti-widget-toast.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-banner.html">
+<link rel="import" href="components/ti-widget-eventlog/ti-widget-eventlog-view.html">
+<link rel="import" href="components/ti-widget-statusbar/ti-widget-statusbar.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-vtabcontainer.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-vtab.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-image.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-tabcontainer.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-tab.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-button.html">
+<link rel="import" href="components/ti-widget-app-menu-buttons/ti-widget-app-menu-buttons.html">
+<link rel="import" href="components/ti-widget-markdown/ti-widget-markdown.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-tilecontainer.html">
+<link rel="import" href="components/ti-tile-wizard/ti-tile-container.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-dialog.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-droplist.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-progressbar.html">
+<link rel="import" href="components/ti-widget-instruments/ti-widget-gauge.html">
+<link rel="import" href="components/ti-widget-common/ti-widget-numberbox.html">
+<link rel="import" href="components/ti-core-databind/ti-transport-network.html">
+<link rel="import" href="components/ti-model-http/ti-model-http.html">
+<link rel="import" href="components/ti-model-http/ti-route-http.html">
+<link rel="import" href="components/ti-widget-terminal/ti-widget-terminal.html">
+
+
+  <template id="template_obj" is="dom-bind">
+
+<style is="custom-style">
+  #ti_widget_menubar {
+    top: 0px;
+    width: 100%;
+    margin: 0px;
+    position: absolute;
+  }
+  html .viewport {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 28px;
+    top: 41px;
+    border: none;
+  }
+  #viewport {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    left: 0px;
+    top: 40px;
+    width: 100%;
+    height: calc(100% - 40px);
+    background-color: rgb(255, 255, 255);
+    overflow: hidden;
+  }
+  #toolbar {
+    top: 0px;
+    height: 45px;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    left: 0px;
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid white;
+    overflow: visible;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 4px;
+    z-index: 10;
+    padding: 4px;
+  }
+  #ti_widget_icon_button_menu {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  #ti_widget_label_menu {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    z-index: 10;
+  }
+  #ti_widget_vtabcontainer {
+    height: calc(100% - 73px);
+    left: 0px;
+    top: 86px;
+    background-color: rgb(255, 255, 255);
+    z-index: 1;
+    overflow: hidden;
+    position: absolute;
+    width: calc(100% - 2px);
+    padding-left: 2px;
+  }
+  #ti_widget_vtab_home {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: hidden;
+    transition: background-color 0.5s ease;
+    background-color: rgb(20, 140, 156);
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: calc(100% - 40px);
+  }
+  #ti_widget_vtab_info {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    background-color: rgb(255, 255, 255);
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+  }
+  #ti_widget_vtab_config {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    background-color: rgb(255, 255, 255);
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+  }
+  #ti_widget_statusbar {
+    position: static;
+  }
+  #ti_widget_eventlog_view {
+    height: 250px;
+    bottom: 30px;
+    width: 100%;
+    display: none;
+    position: absolute;
+    z-index: 10;
+  }
+  #ti_widget_toast {
+    height: 44px;
+    left: 55px;
+    position: fixed;
+    bottom: 30px;
+    z-index: 200;
+    display: block;
+  }
+  #ti_widget_vtab_info {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+  }
+  #ti_widget_tilecontainer_quickstart {
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    overflow: auto;
+    height: calc(100% - 50px);
+  }
+  #ti_widget_tilecontainer_general {
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    overflow: auto;
+    height: calc(100% - 50px);
+  }
+    #ti_widget_tabcontainer {
+        width: 100%;
+        height: 325px;
+        position: absolute;
+        top: calc(100% - 325px);
+        left: 0px;
+    }
+    #ti_widget_tab {
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        overflow: initial;
+        height: 100%;
+        width: 100%;
+        display: block;
+        background-color: rgb(20, 140, 156);
+    }
+    #ti_widget_app_menu_buttons {
+        width: 100%;
+        height: calc(100% - 90px);
+        position: absolute;
+        left: 0px;
+        top: 90px;
+    }
+    #ti_widget_container_greybar {
+        height: 52px;
+        width: 100%;
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        overflow: hidden;
+        left: 0px;
+        top: 0px;
+        position: absolute;
+        background-color: rgb(52, 52, 52);
+    }
+  #ti_widget_label_showless {
+    position: absolute;
+    opacity: 0.7;
+    left: 0px;
+    width: 100%;
+    top: calc(100% - 345px);
+    text-align: center;
+    text-decoration: underline;
+    font-weight: normal;
+    font-style: normal;
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+    white-space: nowrap;
+    height: 20px;
+  }
+  #ti_widget_image {
+    padding-top: 40px;
+    height: calc(100% - 450px);
+    margin: 0px;
+    width: calc(100% - 50px);
+    position: relative;
+    transform: translate(0px, 40px);
+    overflow: hidden;
+    display: inline-block;
+    top: 50px;
+    left: 25px;
+  }
+  #ti_widget_label_productname {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    left: 0px;
+    top: 27px;
+    position: absolute;
+    width: 100%;
+  }
+  #ti_widget_label_productdesc {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    left: 0px;
+    top: 67px;
+    position: absolute;
+    width: 100%;
+    opacity: 0.4;
+  }
+    #ti_widget_container1 {
+        height: 100%;
+        width: 100%;
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        overflow: hidden;
+        left: 0px;
+        top: 0px;
+        position: absolute;
+        background-color: rgb(255, 255, 255);
+        display: block;
+    }
+  #ti_widget_vtab_datacapture {
+    background-color: white;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+  }
+  #ti_widget_vtab_collateral {
+    background-color: white;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    height: calc(100% - 40px);
+  }
+  #ti_widget_vtab_usecases {
+    background-color: white;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    height: calc(100% - 40px);
+  }
+  #ti_tile_container_userguide {
+    width: 200px;
+    height: 200px;
+    overflow: initial;
+    visibility: visible;
+  }
+  #ti_tile_container_appnotes {
+    width: 200px;
+    height: 200px;
+    overflow: initial;
+    visibility: visible;
+  }
+  #ti_widget_label3 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    left: 0px;
+    top: 70px;
+    position: absolute;
+    width: 100%;
+  }
+  #ti_widget_label4 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    left: 0px;
+    top: 70px;
+    position: absolute;
+    width: 100%;
+  }
+  #ti_widget_icon_button3 {
+    width: 100%;
+    height: 80px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_widget_label10 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    left: 0px;
+    top: 70px;
+    position: absolute;
+    width: 100%;
+  }
+  #ti_widget_icon_button4 {
+    width: 100%;
+    height: 80px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_tile_container_datasheet {
+    width: 200px;
+    height: 200px;
+    overflow: initial;
+    visibility: visible;
+  }
+  #ti_widget_icon_button5 {
+    width: 100%;
+    height: 80px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_widget_label13 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    white-space: nowrap;
+    left: 0px;
+    top: 70px;
+    position: absolute;
+    width: 100%;
+  }
+  #ti_widget_icon_button6 {
+    width: 100%;
+    height: 80px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_tile_container_reports {
+    width: 200px;
+    height: 200px;
+    overflow: initial;
+    visibility: visible;
+  }
+  #ti_widget_container_calibration {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_widget_tilecontainer1 {
+    height: 700px;
+    width: 100%;
+    overflow: auto;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    left: 0px;
+    top: 50px;
+    position: absolute;
+  }
+  #ti_widget_markdown_userguides {
+    overflow: hidden;
+    width: calc(100% - 50px);
+    left: 25px;
+    top: 100px;
+    position: absolute;
+    height: calc(100% - 110px);
+    padding: 3px;
+    text-align: center;
+    color: rgb(204, 204, 204);
+  }
+  #ti_widget_markdown_userguides {
+    color: rgb(204, 204, 204);
+  }
+  #ti_widget_markdown_datasheets {
+    position: absolute;
+    top: 100px;
+    left: 25px;
+    width: calc(100% - 50px);
+    height: calc(100% - 110px);
+    text-align: center;
+    color: rgb(204, 204, 204);
+    padding: 3px;
+  }
+  #ti_widget_markdown_appnotes {
+    overflow: hidden;
+    width: calc(100% - 50px);
+    height: calc(100% - 110px);
+    left: 25px;
+    top: 100px;
+    position: absolute;
+    text-align: center;
+    color: rgb(204, 204, 204);
+    padding: 3px;
+  }
+  #ti_widget_markdown_reports {
+    overflow: hidden;
+    width: calc(100% - 50px);
+    height: calc(100% - 110px);
+    left: 25px;
+    top: 100px;
+    position: absolute;
+    text-align: center;
+    color: rgb(204, 204, 204);
+    padding: 3px;
+  }
+  #ti_widget_banner1 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    left: 0px;
+    top: 0px;
+    width: calc(100% - 40px);
+  }
+  #ti_widget_banner2 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_widget_banner3 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+  #ti_widget_banner4 {
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    overflow: initial;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+  }
+    #ti_widget_container5 {
+        height: 38.429em;
+        width:65.072em;
+    }
+    #step_1 {
+        height: 15.214em;
+        width:14.929em;
+        position: absolute;
+        left: 10px;
+        top: 34px;
+        box-shadow: 0px 0px 10px #888888;
+    }
+    #ti_widget_label {
+        position: absolute;
+        left: 73px;
+        top: 4px
+    }
+    #ti_widget_label1 {
+        position: absolute;
+        left: 45px;
+        top: 150px
+    }
+    #ti_widget_label5 {
+        position: absolute;
+        left: 73px;
+        top: 4px;
+    }
+    #ti_widget_label2 {
+        position: absolute;
+        left: 38px;
+        top: 148px;
+    }
+    #step_2 {
+        height: 15.214em;
+        width:14.929em;
+        position: absolute;
+        left: 236px;
+        top: 34px;
+        box-shadow: 0px 0px 10px #888888;
+    }
+    #ti_widget_label9 {
+        position: absolute;
+        left: 73px;
+        top: 4px;
+    }
+    #ti_widget_label6 {
+        position: absolute;
+        left: 34px;
+        top: 148px;
+    }
+    #step_3 {
+        height: 15.214em;
+        width:14.929em;
+        position: absolute;
+        left: 462px;
+        top: 34px;
+        box-shadow: 0px 0px 10px #888888;
+    }
+    #ti_widget_label12 {
+        position: absolute;
+        left: 73px;
+        top: 4px;
+    }
+    #ti_widget_label11 {
+        position: absolute;
+        left: 91px;
+        top: 149px;
+    }
+    #step_4 {
+        height: 15.214em;
+        width:14.929em;
+        position: absolute;
+        left: 688px;
+        top: 34px;
+        box-shadow: 0px 0px 10px #888888;
+    }
+    #Start_button3 {
+        position: absolute;
+        left: 139px;
+        top: 170px;
+        background-color: #06aee6;
+        width: 350px;
+        height: 62px;
+        padding: 4px;
+        font-size: large;
+        font-weight: 900;
+    }
+    #ti_widget_label25 {
+        position: absolute;
+        left: 132px;
+        top: 130px;
+        width: 100px;
+    }
+    #ti_widget_label24 {
+        position: absolute;
+        left: 139px;
+        top: 88px;
+        width: 92px;
+    }
+    #ti_tile_container5 {
+        width: 619px;
+        height: 324px;
+        border: 1px solid lightgray;
+        overflow: initial;
+        visibility: visible;
+        top: -15px;
+    }
+    #ti_widget_label26 {
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        white-space: nowrap;
+        left: 31px;
+        top: 10px;
+        position: absolute;
+    }
+    #ti_widget_container6 {
+        height: 40px;
+        width: calc(100% - 40px);
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        overflow: hidden;
+        left: -1px;
+        top: 54px;
+        position: absolute;
+        display: block;
+        margin-left: 20px;
+        margin-right: 20px;
+        background-color: white;
+        border-bottom: 1px solid rgb(204, 204, 204);
+        z-index: 1;
+        padding: 10px;
+    }
+    #ti_widget_label33 {
+        position: absolute;
+        left: 161px;
+        top: 99px
+    }
+    #ti_widget_label34 {
+        position: absolute;
+        left: 145px;
+        top: 133px;
+        width: 60px
+    }
+    #ti_widget_label35 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label36 {
+        position: absolute;
+        left: 210px;
+        top: 133px;
+        width: 60px;
+    }
+    #int_box_1 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;*/
+        position: absolute;
+        left: 21px;
+        top: 295px;
+        box-shadow: 0px 0px 7px black;
+    }
+    #gauge1 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #ti_widget_label70 {
+        position: absolute;
+        left: 9px;
+        top: 38px;
+        width: 80px;
+    }
+    #freq_list_0 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 35px;
+    }
+    #app_list_0 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 9px;
+    }
+    #ti_widget_label69 {
+        position: absolute;
+        left: 9px;
+        top: 12px;
+        width: 80px;
+    }
+    #core_load_container_0 {
+        width: 280px;
+        height: 105px;
+        border: 1px solid lightgray;
+        overflow: initial;
+        visibility: visible;
+        top: 112px;
+        position: absolute;
+        left: 21px;
+        z-index: 0;
+    }
+    #ti_widget_label37 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label38 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label39 {
+        position: absolute;
+        left: 145px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label40 {
+        position: absolute;
+        left: 210px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label81 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #ti_widget_label82 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label83 {
+        position: absolute;
+        left: 145px;
+        top: 210px;
+        width: 60px;
+    }
+    #ti_widget_label84 {
+        position: absolute;
+        left: 210px;
+        top: 210px;
+        height: 21px;
+        width: 60px;
+    }
+    #ti_widget_banner5 {
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        overflow: initial;
+        left: 0px;
+        top: 0px;
+        position: absolute;
+    }
+    #ti_widget_label32 {
+        position: absolute;
+        left: 122px;
+        top: 34px;
+        width: 371px;
+    }
+    #ti_widget_filemenu1 {
+        position: absolute;
+        left: 274px;
+        top: 78px;
+        width: 65px;
+        background-color: #ececec;
+        opacity: 1;
+        height: 37px
+    }
+    #ti_widget_numberbox {
+        position: absolute;
+        left: 273px;
+        top: 125px;
+        width: 148px
+    }
+    #ti_widget_led4 {
+        width:40px;
+        height:40px;
+        position: absolute;
+        left: 503px;
+        top: 24px;
+    }
+    #freq_list_1 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 35px;
+    }
+    #ti_widget_label72 {
+        position: absolute;
+        left: 9px;
+        top: 38px;
+        width: 80px;
+    }
+    #app_list_1 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 9px;
+    }
+    #ti_widget_label71 {
+        position: absolute;
+        left: 9px;
+        top: 12px;
+        width: 80px;
+    }
+    #core_load_container_1 {
+        width: 280px;
+        height: 105px;
+        border: 1px solid lightgray;
+        overflow: initial;
+        visibility: visible;
+        top: 112px;
+        position: absolute;
+        left: 311px;
+        z-index: 0;
+    }
+    #ti_widget_label88 {
+        position: absolute;
+        left: 210px;
+        top: 210px;
+        height: 21px;
+        width: 60px;
+    }
+    #ti_widget_label87 {
+        position: absolute;
+        left: 145px;
+        top: 210px;
+        width: 60px;
+    }
+    #ti_widget_label86 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label48 {
+        position: absolute;
+        left: 210px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label47 {
+        position: absolute;
+        left: 145px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label46 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label45 {
+        position: absolute;
+        left: 145px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label44 {
+        position: absolute;
+        left: 210px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label43 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label42 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label41 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label85 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge2 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_2 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 311px;
+        top: 295px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #freq_list_2 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 35px;
+    }
+    #ti_widget_label74 {
+        position: absolute;
+        left: 9px;
+        top: 38px;
+        width: 80px;
+    }
+    #app_list_2 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 9px;
+    }
+    #ti_widget_label73 {
+        position: absolute;
+        left: 9px;
+        top: 12px;
+        width: 80px;
+    }
+    #core_load_container_2 {
+        width: 280px;
+        height: 105px;
+        border: 1px solid lightgray;
+        overflow: initial;
+        visibility: visible;
+        top: 112px;
+        position: absolute;
+        left: 601px;
+        z-index: 0;
+    }
+    #ti_widget_label92 {
+        position: absolute;
+        left: 210px;
+        top: 210px;
+        height: 21px;
+        width: 60px;
+    }
+    #ti_widget_label91 {
+        position: absolute;
+        left: 145px;
+        top: 210px;
+        width: 60px;
+    }
+    #ti_widget_label90 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label56 {
+        position: absolute;
+        left: 210px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label55 {
+        position: absolute;
+        left: 145px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label54 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label53 {
+        position: absolute;
+        left: 145px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label52 {
+        position: absolute;
+        left: 210px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label51 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label50 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label49 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label89 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge3 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_3 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 601px;
+        top: 295px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #freq_list_3 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 35px;
+    }
+    #ti_widget_label76 {
+        position: absolute;
+        left: 9px;
+        top: 38px;
+        width: 80px;
+    }
+    #app_list_3 {
+        width:167px;
+        height:auto;
+        position: absolute;
+        left: 95px;
+        top: 9px;
+    }
+    #ti_widget_label75 {
+        position: absolute;
+        left: 9px;
+        top: 12px;
+        width: 80px;
+    }
+    #core_load_container_3 {
+        width: 280px;
+        height: 105px;
+        border: 1px solid lightgray;
+        overflow: initial;
+        visibility: visible;
+        top: 112px;
+        position: absolute;
+        left: 891px;
+        z-index: 0;
+    }
+    #ti_widget_label96 {
+        position: absolute;
+        left: 210px;
+        top: 210px;
+        height: 21px;
+        width: 60px;
+    }
+    #ti_widget_label95 {
+        position: absolute;
+        left: 145px;
+        top: 210px;
+        width: 60px;
+    }
+    #ti_widget_label94 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label64 {
+        position: absolute;
+        left: 210px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label63 {
+        position: absolute;
+        left: 145px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label62 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label61 {
+        position: absolute;
+        left: 145px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label60 {
+        position: absolute;
+        left: 210px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label59 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label58 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label57 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label93 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge4 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_4 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 891px;
+        top: 295px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #core_load_container_a53 {
+        width: 280px;
+        height: 59px;
+        border: 1px solid lightgray;
+        overflow: initial;
+        visibility: visible;
+        top: 112px;
+        position: absolute;
+        left: 1181px;
+        z-index: 0;
+    }
+    #ti_widget_label102 {
+        position: absolute;
+        left: 210px;
+        top: 210px;
+        height: 21px;
+        width: 60px;
+    }
+    #ti_widget_label101 {
+        position: absolute;
+        left: 145px;
+        top: 210px;
+        width: 60px;
+    }
+    #ti_widget_label100 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label99 {
+        position: absolute;
+        left: 210px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label98 {
+        position: absolute;
+        left: 145px;
+        top: 170px;
+        width: 60px;
+    }
+    #ti_widget_label80 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label79 {
+        position: absolute;
+        left: 145px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label68 {
+        position: absolute;
+        left: 210px;
+        top: 133px;
+        width: 60px;
+    }
+    #ti_widget_label67 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label66 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label65 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label97 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge5 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_5 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 1181px;
+        top: 295px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #ti_widget_label28 {
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        white-space: nowrap;
+        left: 31px;
+        top: 10px;
+        position: absolute;
+    }
+    #ti_widget_container8 {
+        height: 40px;
+        width: calc(100% - 40px);
+        text-align: left;
+        text-decoration: none;
+        font-weight: normal;
+        font-style: normal;
+        font-size: inherit;
+        overflow: hidden;
+        left: -1px;
+        top: 54px;
+        position: absolute;
+        display: block;
+        margin-left: 20px;
+        margin-right: 20px;
+        background-color: white;
+        border-bottom: 1px solid rgb(204, 204, 204);
+        z-index: 1;
+        padding: 10px;
+    }
+    #ti_widget_label19 {
+        position: absolute;
+        left: 21px;
+        top: 259px;
+        width: 237px;
+        height: 19px;
+    }
+    #ti_widget_label112 {
+        position: absolute;
+        left: 235px;
+        top: 210px;
+        height: 21px;
+    }
+    #ti_widget_label111 {
+        position: absolute;
+        left: 170px;
+        top: 210px;
+    }
+    #ti_widget_label110 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label109 {
+        position: absolute;
+        left: 235px;
+        top: 170px;
+    }
+    #ti_widget_label108 {
+        position: absolute;
+        left: 170px;
+        top: 170px;
+    }
+    #ti_widget_label107 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label106 {
+        position: absolute;
+        left: 170px;
+        top: 133px;
+    }
+    #ti_widget_label105 {
+        position: absolute;
+        left: 235px;
+        top: 133px;
+    }
+    #ti_widget_label104 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label78 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label77 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label103 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge6 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_6 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 21px;
+        top: 112px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #ti_widget_label20 {
+        position: absolute;
+        left: 21px;
+        top: 259px;
+        width: 237px;
+        height: 19px;
+    }
+    #ti_widget_label124 {
+        position: absolute;
+        left: 235px;
+        top: 210px;
+        height: 21px;
+    }
+    #ti_widget_label123 {
+        position: absolute;
+        left: 170px;
+        top: 210px;
+    }
+    #ti_widget_label122 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label121 {
+        position: absolute;
+        left: 235px;
+        top: 170px;
+    }
+    #ti_widget_label120 {
+        position: absolute;
+        left: 170px;
+        top: 170px;
+    }
+    #ti_widget_label119 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label118 {
+        position: absolute;
+        left: 170px;
+        top: 133px;
+    }
+    #ti_widget_label117 {
+        position: absolute;
+        left: 235px;
+        top: 133px;
+    }
+    #ti_widget_label116 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label115 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label114 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label113 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge7 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_7 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 311px;
+        top: 112px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #ti_widget_label21 {
+        position: absolute;
+        left: 21px;
+        top: 259px;
+        width: 237px;
+        height: 19px;
+    }
+    #ti_widget_label136 {
+        position: absolute;
+        left: 235px;
+        top: 210px;
+        height: 21px;
+    }
+    #ti_widget_label135 {
+        position: absolute;
+        left: 170px;
+        top: 210px;
+    }
+    #ti_widget_label134 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label133 {
+        position: absolute;
+        left: 235px;
+        top: 170px;
+    }
+    #ti_widget_label132 {
+        position: absolute;
+        left: 170px;
+        top: 170px;
+    }
+    #ti_widget_label131 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label130 {
+        position: absolute;
+        left: 170px;
+        top: 133px;
+    }
+    #ti_widget_label129 {
+        position: absolute;
+        left: 235px;
+        top: 133px;
+    }
+    #ti_widget_label128 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label127 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label126 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label125 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge8 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_8 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 601px;
+        top: 112px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #ti_widget_label22 {
+        position: absolute;
+        left: 21px;
+        top: 259px;
+        width: 237px;
+        height: 19px;
+    }
+    #ti_widget_label148 {
+        position: absolute;
+        left: 235px;
+        top: 210px;
+        height: 21px;
+    }
+    #ti_widget_label147 {
+        position: absolute;
+        left: 170px;
+        top: 210px;
+    }
+    #ti_widget_label146 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label145 {
+        position: absolute;
+        left: 235px;
+        top: 170px;
+    }
+    #ti_widget_label144 {
+        position: absolute;
+        left: 170px;
+        top: 170px;
+    }
+    #ti_widget_label143 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label142 {
+        position: absolute;
+        left: 170px;
+        top: 133px;
+    }
+    #ti_widget_label141 {
+        position: absolute;
+        left: 235px;
+        top: 133px;
+    }
+    #ti_widget_label140 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label139 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label138 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label137 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge9 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_9 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 891px;
+        top: 112px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #ti_widget_label23 {
+        position: absolute;
+        left: 21px;
+        top: 259px;
+        width: 237px;
+        height: 19px;
+    }
+    #ti_widget_label160 {
+        position: absolute;
+        left: 235px;
+        top: 210px;
+        height: 21px;
+    }
+    #ti_widget_label159 {
+        position: absolute;
+        left: 170px;
+        top: 210px;
+    }
+    #ti_widget_label158 {
+        position: absolute;
+        left: 35px;
+        top: 208px;
+        width: 96px;
+    }
+    #ti_widget_label157 {
+        position: absolute;
+        left: 235px;
+        top: 170px;
+    }
+    #ti_widget_label156 {
+        position: absolute;
+        left: 170px;
+        top: 170px;
+    }
+    #ti_widget_label155 {
+        position: absolute;
+        left: 33px;
+        top: 163px;
+        width: 98px;
+    }
+    #ti_widget_label154 {
+        position: absolute;
+        left: 170px;
+        top: 133px;
+    }
+    #ti_widget_label153 {
+        position: absolute;
+        left: 235px;
+        top: 133px;
+    }
+    #ti_widget_label152 {
+        position: absolute;
+        left: 31px;
+        top: 134px;
+        width: 100px;
+    }
+    #ti_widget_label151 {
+        position: absolute;
+        left: 224px;
+        top: 99px;
+        width: 32px;
+    }
+    #ti_widget_label150 {
+        position: absolute;
+        left: 161px;
+        top: 99px;
+    }
+    #ti_widget_label149 {
+        position: absolute;
+        left: 160px;
+        top: 29px;
+        width: 101px;
+        height: 38px;
+    }
+    #gauge10 {
+        width: 139px;
+        height: 125px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        box-shadow: 0px 0px 7px grey;
+        padding: 10px 15px 20px 15px;
+    }
+    #int_box_10 {
+        height: 300px;
+        width:280px;
+        /*border: 1px solid black;
+        */ position: absolute;
+        left: 1181px;
+        top: 112px;
+        box-shadow: 0px 0px 7px black;
+        position: absolute;
+    }
+    #load_1 {
+        position: absolute;
+        left: 600px;
+        top: 225px;
+        background-color: #44c85b;
+        width: 568px;
+        height: 40px;
+        font-size: medium;
+        font-weight: 700;
+        z-index: 10;
+    }
+    #load_0 {
+        position: absolute;
+        left: 20px;
+        top: 225px;
+        background-color: #44c85b;
+        width: 568px;
+        height: 40px;
+        font-size: medium;
+        font-weight: 700;
+        z-index: 10;
+    }
+    #core_0_1_container {
+        height: 169px;
+        width:580px;
+        border: 1px solid lightgray;
+        box-shadow: 0px 0px 3px grey;
+        position: absolute;
+        left: 16px;
+        top: 107px;
+        z-index: -1;
+    }
+    #core_2_3_container {
+        height: 169px;
+        width:580px;
+        border: 1px solid lightgray;
+        box-shadow: 0px 0px 5px grey;
+        position: absolute;
+        left: 596px;
+        top: 107px;
+        z-index: -1;
+    }
+</style>
+    <style>
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 400px; /* Adjust as needed */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            padding-top: 180px;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide ti-widget-image {
+            max-height: 90%;
+            object-fit: contain;
+        }
+        .carousel-slide ti-widget-label {
+            color: black; /* Ensure visibility */
+            margin-top: 10px; /* Space from image */
+            text-align: center;
+            width: 80%; /* Constrain width if needed */
+        }
+
+        .carousel-dots {
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .dot {
+            cursor: pointer;
+            height: 15px;
+            width: 15px;
+            margin: 0 5px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+
+        .dot.active, .dot:hover {
+            background-color: #717171;
+        }
+    </style>
+
+<ti-widget-readme background-color="#ffffff" elevation="5" title-text="README.md" id="readmeViewer" pin></ti-widget-readme>
+<ti-core-stylesheets id="ti_core_stylesheets"></ti-core-stylesheets>
+
+<ti-widget-menubar id="ti_widget_menubar" layout class="x-scope ti-widget-menubar-0" horizontal pin product-name="AM335x Demo">
+
+
+    <ti-widget-menuitem name="Tools" id="ti_widget_menuitem_tools" layout>
+
+        <ti-widget-menuaction name="Log pane" action="open_log_pane" icon-name="ti-core-icons:book" id="ti_widget_menuaction_openlog"></ti-widget-menuaction>
+    </ti-widget-menuitem>
+    <ti-widget-zoommenu id="ti_widget_zoommenu" layout></ti-widget-zoommenu>
+    <ti-widget-helpmenu id="ti_widget_helpmenu" layout></ti-widget-helpmenu>
+    <ti-widget-window-buttons show-in-designer id="ti_widget_window_buttons" class="toolMenuItem"></ti-widget-window-buttons>
+</ti-widget-menubar>
+
+<ti-widget-container id="viewport" font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" visible pin class="viewport" title>
+    <ti-widget-container id="toolbar" font-size="inherit" font-style="normal" font-weight="normal" text-align="left" text-decoration="none" visible pin title>
+        <ti-widget-icon-button id="ti_widget_icon_button_menu" icon="menu" icon-color="#000000" visible title layout></ti-widget-icon-button>
+        <ti-widget-label id="ti_widget_label_menu" label="Menu" text-align="left" font-size="inherit" font-style="normal" font-weight="normal" text-decoration="none" visible layout></ti-widget-label>
+    </ti-widget-container>
+    <ti-widget-toast id="ti_widget_toast" message="toast" duration="2000" font-color="#ffffff" class="x-scope ti-widget-toast-0"></ti-widget-toast>
+</ti-widget-container>
+
+<ti-widget-eventlog-view show-event-number show-newest-first is-info-enabled is-warning-enabled is-error-enabled id="ti_widget_eventlog_view" is-hidden class="x-scope ti-widget-eventlog-view-0"></ti-widget-eventlog-view>
+<ti-widget-statusbar id="ti_widget_statusbar" progress-bar-enabled hide-connection></ti-widget-statusbar>
+
+<ti-widget-vtabcontainer id="ti_widget_vtabcontainer" vtab-height-in-px="60" selected-index="0" ink-color="#f1f1f1" color-selected="#ffffff" color-unselected="#888" color-disabled="#ccc" color-selection-bar="white" background-color-selected="#148c9c" background-color-hover="#dcdcec" auto-expand auto-zero-htab-index tab-height-in-px="60" vertical layout>
+    <ti-widget-vtab id="ti_widget_vtab_home" name="Home" icon="home" icon-style="width:30px;height:30px;padding:5px;" visible no-child-tabs-in-menu font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" autoscroll title vertical layout>
+        <ti-widget-label id="ti_widget_label_productname" label="AM335X" text-align="center" font-size="custom" custom-font-size="32px" font-color="#ffffff" font-style="normal" font-weight="normal" text-decoration="none" visible></ti-widget-label>
+        <ti-widget-label id="ti_widget_label_productdesc" label="Analyze system performance, review documentation, and run demos" text-align="center" font-size="custom" font-color="#ffffff" font-style="normal" font-weight="normal" text-decoration="none" visible></ti-widget-label>
+
+        <div class="carousel-container">
+            <div class="carousel-slide active">
+                <ti-widget-image image-path="images/beagl-bone-grn-eco-angled.png" lock-aspect-ratio hover-effect="no" visible lockaspectratio center-justified horizontal layout center></ti-widget-image>
+                <ti-widget-label label="BeagleBone Green Eco: A low-cost, industrial-grade open-source hardware platform for commercial and industrial applications." text-align="center" font-size="medium"></ti-widget-label>
+            </div>
+            <div class="carousel-slide">
+                <ti-widget-image image-path="images/tmdxevm3358-angled.png" lock-aspect-ratio hover-effect="no" visible lockaspectratio center-justified horizontal layout center></ti-widget-image>
+                <ti-widget-label label="AM335x Evaluation Module: Comprehensive development platform for AM335x processors." text-align="center" font-size="medium"></ti-widget-label>
+            </div>
+        </div>
+        <div class="carousel-dots">
+            <span class="dot active" data-slide="0"></span>
+            <span class="dot" data-slide="1"></span>
+        </div>
+
+        <ti-widget-tabcontainer selected-index="0" show-tab-labels-in-designer-only id="ti_widget_tabcontainer" layout>
+            <ti-widget-tab name="Home" icon-style="width:30px;height:30px;padding:5px;" visible font-style="normal" font-weight="normal" text-align="left" text-decoration="none" id="ti_widget_tab" title>
+                <ti-widget-container id="ti_widget_container1" font-size="inherit" font-style="normal" font-weight="normal" text-align="left" text-decoration="none" visible title>
+                    <ti-widget-container id="ti_widget_container_greybar" font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" visible title horizontal layout center-justified center>
+                    </ti-widget-container>
+                    <ti-widget-app-menu-buttons id="ti_widget_app_menu_buttons" background-color="#ffffff" icon-color="#148C9C" selected-index="0" title></ti-widget-app-menu-buttons>
+                </ti-widget-container>
+            </ti-widget-tab>
+        </ti-widget-tabcontainer>
+    </ti-widget-vtab>
+    <ti-widget-vtab id="ti_widget_vtab_audio_classification" name="Audio Classification" caption="Live Audio Classification" icon="av:mic" icon-style="width:30px;height:30px;padding:5px;" visible font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" autoscroll title>
+    <style>
+        .audio-classification-container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .audio-info-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .audio-info-section h3 {
+            color: #148C9C;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #148C9C;
+            padding-bottom: 5px;
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .device-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .device-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .device-card.selected {
+            background-color: #e8f4f5;
+            border: 2px solid #148C9C;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .device-id {
+            font-size: 12px;
+            color: #666;
+            font-family: monospace;
+        }
+
+        .device-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .device-status.available {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .device-status.selected {
+            background-color: #148C9C;
+            color: white;
+        }
+
+        .control-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        .control-button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .control-button.primary {
+            background-color: #148C9C;
+            color: white;
+        }
+
+        .control-button.primary:hover:not(:disabled) {
+            background-color: #0f6b77;
+        }
+
+        .control-button.danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .control-button.danger:hover:not(:disabled) {
+            background-color: #c82333;
+        }
+
+        .control-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .classification-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .classification-display {
+            flex: 0 0 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .classification-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .classification-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #148C9C;
+            text-align: center;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .classification-value.waiting {
+            font-size: 18px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        .stats-container {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f1f7fa;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            margin: 0 0 8px 0;
+            color: #555;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #148C9C;
+        }
+
+        .history-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .history-section h3 {
+            color: #148C9C;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #148C9C;
+            padding-bottom: 5px;
+        }
+
+        .classification-history {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #fafafa;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background-color: white;
+            border-left: 3px solid #148C9C;
+            border-radius: 3px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .history-class {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.active {
+            background-color: #28a745;
+        }
+
+        .status-indicator.inactive {
+            background-color: #dc3545;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #148C9C;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .new-classification {
+            animation: highlight 1s ease;
+        }
+
+        @keyframes highlight {
+            0% {
+                background-color: #ffffcc;
+            }
+            100% {
+                background-color: white;
+            }
+        }
+    </style>
+
+    <div class="audio-classification-container">
+        <div class="audio-info-section">
+            <h3>Audio Input Configuration</h3>
+
+            <div class="control-section">
+                <button id="fetch_devices_button" class="control-button primary">
+                    Refresh Devices
+                </button>
+            </div>
+
+            <div id="device_list_container" class="device-grid">
+                <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">
+                    Click "Refresh Devices" to load available audio input devices
+                </div>
+            </div>
+
+            <div class="control-section">
+                <button id="start_audio_button" class="control-button primary" disabled>
+                    Start Classification
+                </button>
+                <button id="stop_audio_button" class="control-button danger" disabled>
+                    Stop Classification
+                </button>
+            </div>
+        </div>
+
+        <div class="audio-info-section">
+            <h3>Live Classification</h3>
+            <div class="classification-metrics">
+                <div class="classification-display">
+                    <div class="classification-label">Current Classification</div>
+                    <div id="audio_classification_result" class="classification-value waiting">
+                        Waiting to start...
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <span id="status_indicator" class="status-indicator inactive"></span>
+                        <span id="status_text" style="color: #666;">Inactive</span>
+                    </div>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>Total Classifications</h4>
+                            <div id="total_classifications" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Unique Classes</h4>
+                            <div id="unique_classes" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Session Time</h4>
+                            <div id="session_time" class="stat-value">00:00</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Updates/Min</h4>
+                            <div id="update_rate" class="stat-value">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-info-section history-section">
+            <h3>Classification History</h3>
+            <div id="classification_history" class="classification-history">
+                <div style="text-align: center; color: #999; padding: 20px;">
+                    No classifications yet. Start audio classification to see results here.
+                </div>
+            </div>
+        </div>
+    </div>
+</ti-widget-vtab>
+    <ti-widget-vtab id="ti_widget_vtab_cpu_performance" name="CPU Performance" icon="icons:assessment" icon-style="width:30px;height:30px;padding:5px;" visible no-child-tabs-in-menu font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" autoscroll title vertical layout>
+        <style>
+            .cpu-performance-container {
+                padding: 20px;
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .cpu-info-section {
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+            .cpu-info-section h3 {
+                color: #148C9C;
+                margin-top: 0;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #148C9C;
+                padding-bottom: 5px;
+            }
+            .cpu-info-container {
+                margin-bottom: 20px;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background-color: white;
+            }
+            .cpu-metrics {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .gauge-container {
+                flex: 0 0 300px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 15px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .stats-container {
+                flex: 1;
+                min-width: 250px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 20px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .stats-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 15px;
+            }
+            .stats-card {
+                flex: 1;
+                padding: 15px;
+                border-radius: 5px;
+                text-align: center;
+                margin: 0 10px;
+                background-color: #f1f7fa;
+            }
+            .stats-card h4 {
+                margin-top: 0;
+                margin-bottom: 5px;
+                color: #555;
+                font-size: 14px;
+            }
+            .stats-value {
+                font-size: 24px;
+                font-weight: bold;
+                color: #148C9C;
+            }
+            .history-section {
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                padding: 20px;
+            }
+            .history-section h3 {
+                color: #148C9C;
+                margin-top: 0;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #148C9C;
+                padding-bottom: 5px;
+            }
+            .chart-container {
+                height: 300px;
+                position: relative;
+            }
+        </style>
+
+        <div class="cpu-performance-container">
+            <div class="cpu-info-section">
+                <h3>CPU Information</h3>
+                <div id="cpu-info-container" class="cpu-info-container">
+                    <!-- CPU info will be populated here -->
+                    <div style="text-align: center; color: #888;">Loading CPU information...</div>
+                </div>
+            </div>
+
+            <div class="cpu-info-section">
+                <h3>CPU Usage</h3>
+                <div class="cpu-metrics">
+                    <div class="gauge-container">
+                        <ti-widget-gauge id="cpu_usage_gauge" value="0" title-label="Current" decimal-places="1"
+                            gauge-thickness="40" fractional-scale-decimals="0" number-format="standard"
+                            size="0" units="%" value-font-size="x-large"></ti-widget-gauge>
+                        <div>Real-time CPU utilization</div>
+                    </div>
+                    <div class="stats-container">
+                        <div class="stats-row">
+                            <div class="stats-card">
+                                <h4>AVERAGE USAGE</h4>
+                                <div class="stats-value" id="avg_cpu_value">0.0%</div>
+                                <!-- Removed duplicate label -->
+                            </div>
+                            <div class="stats-card">
+                                <h4>MAXIMUM USAGE</h4>
+                                <div class="stats-value" id="max_cpu_value">0.0%</div>
+                                <!-- Removed duplicate label -->
+                            </div>
+                        </div>
+                        <div style="text-align: center; color: #666; font-style: italic;">
+                            Statistics calculated since application start
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cpu-info-section history-section">
+                <h3>CPU History</h3>
+                <div class="chart-container">
+                    <canvas id="cpu_chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </ti-widget-vtab>
+    <ti-widget-vtab id="ti_widget_vtab_collaterals" name="Documentation" icon="icons:description" icon-style="width:30px;height:30px;padding:5px;" visible no-child-tabs-in-menu font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" autoscroll title vertical layout>
+        <style>
+            /* Modern, clean documentation section */
+            .docs-container {
+                padding: 40px 20px;
+                max-width: 1400px;
+                margin: 0 auto;
+                background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+                min-height: 100vh;
+            }
+
+            .docs-header {
+                margin-bottom: 60px;
+            }
+
+            .docs-header h1 {
+                font-size: 42px;
+                color: #1a1a1a;
+                margin-bottom: 16px;
+                font-weight: 300;
+                letter-spacing: -1px;
+            }
+
+            .docs-header h1 span {
+                color: #CC0000;
+                font-weight: 600;
+            }
+
+            .docs-header p {
+                font-size: 20px;
+                color: #666;
+                font-weight: 300;
+                max-width: 600px;
+            }
+
+            .docs-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+                gap: 32px;
+                margin-bottom: 60px;
+            }
+
+            .doc-card {
+                background: white;
+                border-radius: 20px;
+                padding: 32px;
+                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+                position: relative;
+                border: 1px solid rgba(0, 0, 0, 0.06);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .doc-card::after {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(204, 0, 0, 0.03) 0%, transparent 70%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .doc-card:hover::after {
+                opacity: 1;
+            }
+
+            .doc-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            }
+
+            .doc-card-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .doc-card-icon {
+                width: 48px;
+                height: 48px;
+                background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 16px;
+                transition: all 0.4s ease;
+            }
+
+            .doc-card:hover .doc-card-icon {
+                background: linear-gradient(135deg, #CC0000 0%, #148C9C 100%);
+                transform: rotate(5deg) scale(1.05);
+            }
+
+            .doc-card:nth-child(2) .doc-card-icon {
+                background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            }
+
+            .doc-card:nth-child(2):hover .doc-card-icon {
+                background: linear-gradient(135deg, #148C9C 0%, #0d5a6c 100%);
+            }
+
+            .doc-card h3 {
+                color: #1a1a1a;
+                font-size: 22px;
+                margin: 0;
+                font-weight: 600;
+                letter-spacing: -0.5px;
+                flex: 1;
+            }
+
+            .doc-card-description {
+                color: #6c757d;
+                font-size: 15px;
+                line-height: 1.7;
+                margin-bottom: 24px;
+                flex: 1;
+            }
+
+            .doc-card-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-top: 20px;
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .doc-card-link {
+                color: #CC0000;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                transition: all 0.3s ease;
+            }
+
+            .doc-card-link:hover {
+                transform: translateX(4px);
+            }
+
+            .doc-card-link::after {
+                content: '→';
+                margin-left: 6px;
+                transition: transform 0.3s ease;
+            }
+
+            .doc-card:hover .doc-card-link::after {
+                transform: translateX(4px);
+            }
+
+            .doc-card-badge {
+                padding: 4px 10px;
+                background: rgba(204, 0, 0, 0.08);
+                color: #CC0000;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .quick-links {
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+                border: 1px solid rgba(0, 0, 0, 0.06);
+            }
+
+            .quick-links h2 {
+                font-size: 28px;
+                color: #1a1a1a;
+                margin-bottom: 24px;
+                font-weight: 300;
+                letter-spacing: -0.5px;
+            }
+
+            .quick-links-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 16px;
+            }
+
+            .quick-link {
+                padding: 14px 18px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                border-radius: 12px;
+                text-decoration: none;
+                color: #495057;
+                transition: all 0.3s ease;
+                border: 1px solid transparent;
+                font-size: 14px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .quick-link-icon {
+                width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                opacity: 0.7;
+                transition: all 0.3s ease;
+            }
+
+            .quick-link:hover .quick-link-icon {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+            .quick-link-text {
+                flex: 1;
+            }
+
+            .quick-link:hover {
+                background: white;
+                border-color: #CC0000;
+                color: #CC0000;
+                transform: translateX(4px);
+                box-shadow: 0 4px 12px rgba(204, 0, 0, 0.08);
+            }
+
+            .quick-link::after {
+                content: '↗';
+                position: absolute;
+                right: 14px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                font-size: 12px;
+            }
+
+            .quick-link:hover::after {
+                opacity: 0.6;
+            }
+        </style>
+
+        <div class="docs-container">
+            <div class="docs-header">
+                <h1>Documentation & <span>Resources</span></h1>
+                <p>Everything you need to develop with AM335x Sitara processors</p>
+            </div>
+
+            <div class="docs-grid">
+                <div class="doc-card" onclick="window.open('https://www.ti.com/product/AM3358', '_blank')">
+                    <div class="doc-card-header">
+                        <div class="doc-card-icon">
+                            <ti-widget-icon icon="hardware:developer_board" icon-size="24" icon-color="#666"></ti-widget-icon>
+                        </div>
+                        <h3>Product Page</h3>
+                    </div>
+                    <p class="doc-card-description">
+                        Explore specifications, features, and ordering information for the AM335x Sitara processor family
+                    </p>
+                    <div class="doc-card-footer">
+                        <a href="https://www.ti.com/product/AM3358" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                            View Product
+                        </a>
+                        <span class="doc-card-badge">Official</span>
+                    </div>
+                </div>
+
+                <div class="doc-card" onclick="window.open('https://www.ti.com/lit/ug/spruh73p/spruh73p.pdf', '_blank')">
+                    <div class="doc-card-header">
+                        <div class="doc-card-icon">
+                            <ti-widget-icon icon="action:book" icon-size="24" icon-color="#666"></ti-widget-icon>
+                        </div>
+                        <h3>Technical Reference Manual</h3>
+                    </div>
+                    <p class="doc-card-description">
+                        Complete technical documentation covering all AM335x subsystems, peripherals, and registers
+                    </p>
+                    <div class="doc-card-footer">
+                        <a href="https://www.ti.com/lit/ug/spruh73p/spruh73p.pdf" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                            Download PDF
+                        </a>
+                        <span class="doc-card-badge">4000+ pages</span>
+                    </div>
+                </div>
+
+                <div class="doc-card" onclick="window.open('https://www.ti.com/tool/PROCESSOR-SDK-AM335X', '_blank')">
+                    <div class="doc-card-header">
+                        <div class="doc-card-icon">
+                            <ti-widget-icon icon="file:folder" icon-size="24" icon-color="#666"></ti-widget-icon>
+                        </div>
+                        <h3>Processor SDK</h3>
+                    </div>
+                    <p class="doc-card-description">
+                        Linux development kit with drivers, libraries, and ready-to-run example applications
+                    </p>
+                    <div class="doc-card-footer">
+                        <a href="https://www.ti.com/tool/PROCESSOR-SDK-AM335X" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                            Get SDK
+                        </a>
+                        <span class="doc-card-badge">Latest</span>
+                    </div>
+                </div>
+
+                <div class="doc-card" onclick="window.open('https://software-dl.ti.com/processor-sdk-linux/esd/AM335X/latest/exports/docs/linux/Overview/Processor_SDK_Linux_Getting_Started_Guide.html', '_blank')">
+                    <div class="doc-card-header">
+                        <div class="doc-card-icon">
+                            <ti-widget-icon icon="action:article" icon-size="24" icon-color="#666"></ti-widget-icon>
+                        </div>
+                        <h3>Getting Started</h3>
+                    </div>
+                    <p class="doc-card-description">
+                        Step-by-step guides for SDK installation, building applications, and deployment
+                    </p>
+                    <div class="doc-card-footer">
+                        <a href="https://software-dl.ti.com/processor-sdk-linux/esd/AM335X/latest/exports/docs/linux/Overview/Processor_SDK_Linux_Getting_Started_Guide.html" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                            Browse Docs
+                        </a>
+                        <span class="doc-card-badge">Guides</span>
+                    </div>
+                </div>
+
+                <div class="doc-card" onclick="window.open('https://e2e.ti.com/support/processors/', '_blank')">
+                    <div class="doc-card-header">
+                        <div class="doc-card-icon">
+                            <ti-widget-icon icon="communication:forum" icon-size="24" icon-color="#666"></ti-widget-icon>
+                        </div>
+                        <h3>Community Forum</h3>
+                    </div>
+                    <p class="doc-card-description">
+                        Get help from TI engineers and connect with thousands of embedded developers
+                    </p>
+                    <div class="doc-card-footer">
+                        <a href="https://e2e.ti.com/support/processors/" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                            Join Discussion
+                        </a>
+                        <span class="doc-card-badge">Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-links">
+                <h2>Additional Resources</h2>
+                <div class="quick-links-grid">
+                    <a href="https://www.ti.com/lit/ds/symlink/am3358.pdf" target="_blank" class="quick-link">
+                        <span class="quick-link-icon">
+                            <ti-widget-icon icon="action:description" icon-size="16" icon-color="#666"></ti-widget-icon>
+                        </span>
+                        <span class="quick-link-text">Datasheet</span>
+                    </a>
+                    <a href="https://github.com/beagleboard" target="_blank" class="quick-link">
+                        <span class="quick-link-icon">
+                            <ti-widget-icon icon="action:code" icon-size="16" icon-color="#666"></ti-widget-icon>
+                        </span>
+                        <span class="quick-link-text">BeagleBoard GitHub</span>
+                    </a>
+                    <a href="https://www.ti.com/tool/CCSTUDIO" target="_blank" class="quick-link">
+                        <span class="quick-link-icon">
+                            <ti-widget-icon icon="action:build" icon-size="16" icon-color="#666"></ti-widget-icon>
+                        </span>
+                        <span class="quick-link-text">Code Composer Studio</span>
+                    </a>
+                    <a href="https://dev.ti.com/tirex/" target="_blank" class="quick-link">
+                        <span class="quick-link-icon">
+                            <ti-widget-icon icon="action:explore" icon-size="16" icon-color="#666"></ti-widget-icon>
+                        </span>
+                        <span class="quick-link-text">TI Resource Explorer</span>
+                    </a>
+                    <a href="https://www.ti.com/tool/SYSCONFIG" target="_blank" class="quick-link">
+                        <span class="quick-link-icon">
+                            <ti-widget-icon icon="action:settings" icon-size="16" icon-color="#666"></ti-widget-icon>
+                        </span>
+                        <span class="quick-link-text">SysConfig Tool</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </ti-widget-vtab>
+</ti-widget-vtabcontainer>
+</template><!--gist-end-->
+
+<!-- ------------------------------------------------------------------------------------- -->
+
+<script>
+    document.addEventListener('WebComponentsReady', function() {
+        var cpuUsageGauge = document.querySelector('#cpu_usage_gauge');
+        var cpuChartCanvas = document.querySelector('#cpu_chart');
+
+        // Initialize chart with given data
+        function initializeChart(ctx, cpuData) {
+            if (!cpuData.history) {
+                cpuData.history = [0]; // Start with zero if no history
+            }
+
+            // Use history_count if available to log more meaningful information
+            const historyCount = cpuData.history_count || cpuData.history.length;
+            console.log("Initializing chart with " + cpuData.history.length + " data points (history count: " + historyCount + ")");
+
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from(Array(cpuData.history.length).keys()),
+                    datasets: [{
+                        label: 'CPU Usage (%)',
+                        data: cpuData.history.slice(),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        pointRadius: 0, // Hide points for smoother appearance
+                        borderWidth: 2  // Slightly thicker line
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'CPU Usage (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (minutes:seconds ago)'
+                            },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    // Calculate minutes and seconds for this tick
+                                    const totalSeconds = Math.floor(value);
+                                    const minutes = Math.floor(totalSeconds / 60);
+                                    const seconds = totalSeconds % 60;
+
+                                    // Only show labels at certain intervals
+                                    if (minutes === 0) {
+                                        if (seconds % 15 === 0) { // Every 15 seconds in first minute
+                                            return seconds + 's';
+                                        }
+                                    } else if (seconds === 0) { // On minute marks
+                                        return minutes + 'm';
+                                    } else if (seconds % 30 === 0 && index % 2 === 0) { // Every 30 seconds, but not all
+                                        return minutes + 'm' + seconds + 's';
+                                    }
+                                    return '';
+                                },
+                                maxTicksLimit: 10
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 0 // No animation for better performance
+                    }
+                }
+            });
+        }
+
+        // Function to load static CPU info
+        function loadCpuInfo() {
+            var infoContainer = $('#cpu-info-container');
+            if (infoContainer.length) {
+                $.get('/cpu-info', function(data) {
+                    try {
+                        var infoData = JSON.parse(data);
+                        if (infoData) {
+                            var content = '<dl style="margin: 0;">';
+                            content += '<dt style="font-weight: bold; float: left; width: 120px; clear: left;">Architecture</dt>';
+                            content += '<dd style="margin-left: 130px;">' + infoData.architecture + '</dd>';
+                            content += '<dt style="font-weight: bold; float: left; width: 120px; clear: left;">Vendor ID</dt>';
+                            content += '<dd style="margin-left: 130px;">' + infoData.vendor + '</dd>';
+                            content += '<dt style="font-weight: bold; float: left; width: 120px; clear: left;">Model Name</dt>';
+                            content += '<dd style="margin-left: 130px;">' + infoData.model + '</dd>';
+                            content += '</dl>';
+                            infoContainer.html(content);
+                        }
+                    } catch (e) {
+                        infoContainer.html('<p>Error parsing CPU information: ' + e.message + '</p>');
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    infoContainer.html('<p>Could not load CPU information: ' + textStatus + ' - ' + errorThrown + '</p>');
+                });
+            }
+        }
+
+        if (cpuUsageGauge && cpuChartCanvas) {
+            var cpuChart;
+            var cpuInfoLoaded = false;
+
+            function updateCpuPerformance() {
+                // Get enhanced CPU stats
+                $.get('/cpu-load', function(data) {
+                    try {
+                        // Try to parse the response as JSON
+                        var cpuData = JSON.parse(data);
+
+                        // Update CPU gauge with current usage
+                        cpuUsageGauge.value = cpuData.current_cpu_usage;
+
+                        // Make sure we have valid average and max values
+                        if (typeof cpuData.average_cpu_usage !== 'number' || isNaN(cpuData.average_cpu_usage)) {
+                            cpuData.average_cpu_usage = 0.0;
+                        }
+                        if (typeof cpuData.max_cpu_usage !== 'number' || isNaN(cpuData.max_cpu_usage)) {
+                            cpuData.max_cpu_usage = 0.0;
+                        }
+
+                        // Update the styled elements with proper formatting
+                        $('#avg_cpu_value').text(cpuData.average_cpu_usage.toFixed(1) + '%');
+                        $('#max_cpu_value').text(cpuData.max_cpu_usage.toFixed(1) + '%');
+
+                        // Make sure we have valid history data
+                        if (!Array.isArray(cpuData.history) || cpuData.history.length === 0) {
+                            console.warn("Received invalid or empty history data:", cpuData.history);
+                            // Initialize with current value if history is invalid
+                            cpuData.history = [cpuData.current_cpu_usage || 0];
+                        }
+
+                        // Log the history count from the CPU stats utility
+                        if (cpuData.history_count !== undefined) {
+                            console.log("History count from CPU stats:", cpuData.history_count);
+                        }
+
+                        // Debug output to console with full details for troubleshooting
+                        console.log("Received CPU data:", JSON.stringify({
+                            current: cpuData.current_cpu_usage,
+                            avg: cpuData.average_cpu_usage,
+                            max: cpuData.max_cpu_usage,
+                            historyLength: cpuData.history.length,
+                            historyStart: cpuData.history.slice(0, 3),
+                            historyEnd: cpuData.history.slice(-3)
+                        }));
+
+                        // First time initialization of chart or ensure it exists
+                        if (!cpuChart && cpuChartCanvas) {
+                            console.log("Creating new CPU chart");
+                            var ctx = cpuChartCanvas.getContext('2d');
+                            cpuChart = initializeChart(ctx, cpuData);
+                        }
+
+                        // Update the existing chart with data
+                        if (cpuChart) {
+                            console.log("Updating CPU chart with " + cpuData.history.length + " data points");
+
+                            // Always use the last 300 points (5 minutes) for smooth rolling window
+                            // The backend already handles the rolling window in cpu_stats.c
+                            const dataPoints = cpuData.history.slice(); // Clone array
+
+                            // Create time labels for the x-axis (in seconds ago format)
+                            const labels = [];
+                            for (let i = 0; i < dataPoints.length; i++) {
+                                // Label every 30 seconds for clarity
+                                if (i % 30 === 0) {
+                                    const secondsAgo = dataPoints.length - i - 1;
+                                    if (secondsAgo === 0) {
+                                        labels.push('Now');
+                                    } else if (secondsAgo < 60) {
+                                        labels.push(secondsAgo + 's');
+                                    } else {
+                                        const minutes = Math.floor(secondsAgo / 60);
+                                        const seconds = secondsAgo % 60;
+                                        labels.push(minutes + 'm' + (seconds > 0 ? seconds + 's' : ''));
+                                    }
+                                } else {
+                                    labels.push('');
+                                }
+                            }
+
+                            cpuChart.data.labels = labels;
+                            cpuChart.data.datasets[0].data = dataPoints;
+
+                            // Always show "last 5 minutes" when we have enough data
+                            if (cpuData.history.length >= 300) {
+                                cpuChart.options.scales.x.title.text = 'Time (last 5 minutes - rolling window)';
+                            } else {
+                                const totalSeconds = cpuData.history.length;
+                                const minutes = Math.floor(totalSeconds / 60);
+                                const seconds = totalSeconds % 60;
+                                cpuChart.options.scales.x.title.text = 'Time (' + (minutes > 0 ? minutes + 'm ' : '') + seconds + 's)';
+                            }
+
+                            // Smooth animation for rolling effect
+                            cpuChart.update('none'); // Use 'none' for no animation to reduce CPU load
+                        } else {
+                            // If chart initialization in the first block failed, try again
+                            var ctx = cpuChartCanvas.getContext('2d');
+                            cpuChart = initializeChart(ctx, cpuData);
+                        }
+                    } catch (e) {
+                        // If not JSON, it's probably just a number (old format)
+                        var cpuUsage = parseFloat(data);
+                        if (!isNaN(cpuUsage)) {
+                            cpuUsageGauge.value = cpuUsage;
+
+                            // For single value format, we need to maintain our own statistics
+                            // Update running averages and max manually
+                            var currentAvg = parseFloat($('#avg_cpu_value').text());
+                            var currentMax = parseFloat($('#max_cpu_value').text());
+
+                            // If we don't have an average yet, start with this value
+                            if (isNaN(currentAvg)) {
+                                currentAvg = cpuUsage;
+                            } else {
+                                // Apply smoothing to average (95% old value, 5% new value)
+                                currentAvg = (0.95 * currentAvg) + (0.05 * cpuUsage);
+                            }
+
+                            // Update max if needed
+                            if (isNaN(currentMax) || cpuUsage > currentMax) {
+                                currentMax = cpuUsage;
+                            }
+
+                            // Update the display
+                            $('#avg_cpu_value').text(currentAvg.toFixed(1) + '%');
+                            $('#max_cpu_value').text(currentMax.toFixed(1) + '%');
+                            if (cpuChart) {
+                                // Track current data array length
+                                const currentLength = cpuChart.data.datasets[0].data.length;
+
+                                // Add new point to existing chart
+                                cpuChart.data.datasets[0].data.push(cpuUsage);
+
+                                // Remove oldest point if we have too many
+                                if (cpuChart.data.datasets[0].data.length > 300) { // Keep 300 points for 5 minutes
+                                    cpuChart.data.datasets[0].data.shift();
+                                }
+
+                                // Update labels to represent seconds in reverse chronological order
+                                // (most recent values on the right side of the chart)
+                                cpuChart.data.labels = Array.from(
+                                    Array(cpuChart.data.datasets[0].data.length).keys()
+                                ).reverse();
+
+                                // Debug to monitor chart updates
+                                console.log("Updated chart with new value:", cpuUsage,
+                                          "Total points:", cpuChart.data.datasets[0].data.length);
+
+                                // Update the chart with animation: false for better performance
+                                cpuChart.update({
+                                    duration: 0,
+                                    easing: 'linear'
+                                });
+                            } else {
+                                // Initialize chart with single value
+                                var ctx = cpuChartCanvas.getContext('2d');
+                                cpuChart = new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: [0], // Start with a single value
+                                        datasets: [{
+                                            label: 'CPU Usage (%)',
+                                            data: [cpuUsage],
+                                            borderColor: 'rgb(75, 192, 192)',
+                                            tension: 0.1,
+                                            fill: true,
+                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                            pointRadius: 0, // Hide points for smoother appearance
+                                            borderWidth: 2  // Slightly thicker line
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                max: 100,
+                                                title: {
+                                                    display: true,
+                                                    text: 'CPU Usage (%)'
+                                                }
+                                            },
+                                            x: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Time (minutes:seconds ago)'
+                                                },
+                                                ticks: {
+                                                    // Custom function to format x-axis labels as minutes:seconds
+                                                    callback: function(value, index, values) {
+                                                        // For a 5-minute history with 300 points
+                                                        // Calculate minutes and seconds for this tick
+                                                        const totalSeconds = Math.floor(value);
+                                                        const minutes = Math.floor(totalSeconds / 60);
+                                                        const seconds = totalSeconds % 60;
+
+                                                        // Only show labels at certain intervals to avoid overcrowding
+                                                        if (minutes === 0) {
+                                                            if (seconds % 15 === 0) { // Every 15 seconds in first minute
+                                                                return seconds + 's';
+                                                            }
+                                                        } else if (seconds === 0) { // On minute marks
+                                                            return minutes + 'm';
+                                                        } else if (seconds % 30 === 0) { // Every 30 seconds after first minute
+                                                            return minutes + 'm' + seconds + 's';
+                                                        }
+                                                        return '';
+                                                    },
+                                                    // Limit number of ticks to avoid overcrowding
+                                                    maxTicksLimit: 15
+                                                }
+                                            }
+                                        },
+                                        animation: {
+                                            duration: 500
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+                // Get CPU info for the information panel
+                if (!cpuInfoLoaded) {
+                    $.get('/cpu-info', function(data) {
+                        try {
+                            var infoData = JSON.parse(data);
+                            var infoContainer = $('#cpu-info-container');
+
+                            if (infoData && infoContainer.length) {
+                                var content = '<dl style="margin: 0;">';
+                                content += '<dt style="font-weight: bold; float: left; width: 120px; clear: left;">Architecture</dt>';
+                                content += '<dd style="margin-left: 130px;">' + infoData.architecture + '</dd>';
+                                content += '<dt style="font-weight: bold; float: left; width: 120px; clear: left;">Vendor ID</dt>';
+                                content += '<dd style="margin-left: 130px;">' + infoData.vendor + '</dd>';
+                                content += '<dt style="font-weight: bold; float: left; width: 120px; clear: left;">Model Name</dt>';
+                                content += '<dd style="margin-left: 130px;">' + infoData.model + '</dd>';
+                                content += '</dl>';
+                                infoContainer.html(content);
+                                cpuInfoLoaded = true;
+                            }
+                        } catch (e) {
+                            console.error("Error parsing CPU info:", e);
+                        }
+                    });
+                }
+            }
+
+            // Update more frequently for smoother chart animation (500ms instead of 1000ms)
+            setInterval(updateCpuPerformance, 500);
+            // Initial update
+            updateCpuPerformance();
+        }
+
+        // Load the CPU info once
+        loadCpuInfo();
+    });
+</script>
+<script>
+	// Do not edit this file - it is automatically generated.  Please edit index.js
+	addEventListener('WebComponentsReady', function () {
+		// remove splash
+        var splash = document.querySelector("#splash")
+        if (splash) {
+			splash.parentNode.removeChild(splash);
+        }
+	});
+</script>
+</body>
+</html>

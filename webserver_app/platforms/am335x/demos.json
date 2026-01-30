@@ -1,0 +1,26 @@
+{
+  "demos": [
+    {
+      "id": "audio_classification",
+      "name": "Audio Classification",
+      "description": "Real-time audio classification using TensorFlow Lite and YAMNet model",
+      "type": "streaming",
+      "category": "ml_inference",
+      "executable": "/usr/bin/audio_utils",
+      "config_requirements": ["alsa", "gstreamer", "tensorflow_lite"],
+      "fifo_path": "/tmp/audio_classification_fifo",
+      "pid_file": "/tmp/audio_classification.pid",
+      "model_path": "/usr/share/oob-demo-assets/models/yamnet_audio_classification.tflite",
+      "labels_path": "/usr/share/oob-demo-assets/labels/yamnet_label_list.txt",
+      "metrics": ["classification_result", "device_list", "session_stats"],
+      "ui": {
+        "icon": "volume-up",
+        "color": "green",
+        "real_time": true,
+        "show_device_selection": true,
+        "show_classification_history": true,
+        "show_statistics": true
+      }
+    }
+  ]
+}

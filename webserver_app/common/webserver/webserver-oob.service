@@ -1,0 +1,13 @@
+[Unit]
+Description=AM335x OOB Demo Webserver
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+EnvironmentFile=/etc/webserver-oob.conf
+ExecStart=webserver-oob $APP_DIR
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

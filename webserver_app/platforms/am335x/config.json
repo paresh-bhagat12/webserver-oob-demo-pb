@@ -1,0 +1,65 @@
+{
+  "platform": {
+    "id": "am335x",
+    "name": "AM335x Evaluation Module",
+    "description": "Comprehensive development platform for AM335x processors",
+    "processor": "AM335x",
+    "architecture": "armv7"
+  },
+  "ui": {
+    "title": "AM335x Demo",
+    "product_name": "AM335x Demo",
+    "board_label": "AM335X",
+    "board_images": [
+      {
+        "name": "BeagleBone Green",
+        "path": "assets/beagl-bone-grn-eco-angled.png",
+        "description": "BeagleBone Green: Low-cost development board"
+      },
+      {
+        "name": "AM335x EVM",
+        "path": "assets/tmdxevm3358-angled.png",
+        "description": "AM335x Evaluation Module: Comprehensive development platform for AM335x processors."
+      }
+    ]
+  },
+  "documentation": [
+    {
+      "title": "AM335x Product Page",
+      "url": "https://www.ti.com/product/AM3358",
+      "type": "product",
+      "icon": "ti-ic-productfolder-lg"
+    },
+    {
+      "title": "AM335x Technical Reference Manual",
+      "url": "https://www.ti.com/lit/ug/spruh73p/spruh73p.pdf",
+      "type": "technical",
+      "icon": "ti-ic-archive-lg"
+    },
+    {
+      "title": "Processor SDK AM335x",
+      "url": "https://www.ti.com/tool/PROCESSOR-SDK-AM335X",
+      "type": "sdk",
+      "icon": "ti-ic-download-lg"
+    },
+    {
+      "title": "AM335x Linux Kernel User's Guide",
+      "url": "https://software-dl.ti.com/processor-sdk-linux/esd/AM335X/latest/exports/docs/linux/Overview/Overview_Building_the_SDK.html",
+      "type": "documentation",
+      "icon": "ti-ic-archive-lg"
+    },
+    {
+      "title": "AM335x U-Boot User's Guide",
+      "url": "https://software-dl.ti.com/processor-sdk-linux/esd/AM335X/latest/exports/docs/linux/Overview/Overview_Building_the_SDK.html#u-boot",
+      "type": "documentation",
+      "icon": "ti-ic-archive-lg"
+    },
+    {
+      "title": "E2E Support Forums",
+      "url": "https://e2e.ti.com/support/processors/f/processors-forum",
+      "type": "support",
+      "icon": "ti-ic-community-lg"
+    }
+  ],
+  "features": ["system_info", "audio_classification", "cpu_monitoring"]
+}
