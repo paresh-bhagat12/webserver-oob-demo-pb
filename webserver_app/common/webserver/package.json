@@ -16,6 +16,6 @@
   },
   "private": true,
   "bin": {
-    "webserver-generic": "webserver.js"
+    "webserver-oob": "webserver.js"
   }
 }

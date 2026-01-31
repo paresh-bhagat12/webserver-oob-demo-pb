@@ -13,7 +13,7 @@
         "ws": "^8.14.2"
       },
       "bin": {
-        "webserver-generic": "webserver.js"
+        "webserver-oob": "webserver.js"
       }
     },
     "node_modules/accepts": {
