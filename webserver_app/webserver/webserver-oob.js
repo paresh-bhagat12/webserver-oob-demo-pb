@@ -45,6 +45,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
+const configManager = require('./config-loader');
 
 /* Set the path from command line argument */
 const app_dir = process.argv[2] || 'app';
@@ -60,8 +61,41 @@ let fifoReaderProcess = null;
 let audioProcess = null;
 let connectedAudioClients = new Set();
 
+/* Load platform configuration */
+let platformConfig;
+try {
+    platformConfig = configManager.loadConfiguration();
+    console.log(`[Platform] Loaded configuration for: ${platformConfig.platform.name}`);
+} catch (error) {
+    console.error('[Platform] Failed to load configuration:', error.message);
+    console.log('[Platform] Continuing with default AM335x behavior...');
+    // Continue without configuration for backward compatibility
+}
+
 /* Place the GUI files onto the server */
 app.use(express.static(app_dir));
+
+/* Platform configuration endpoint */
+app.get('/api/platform/config', (req, res) => {
+    try {
+        const config = configManager.getConfig();
+        res.json(config);
+    } catch (error) {
+        console.error('[Platform] Error serving config:', error);
+        res.status(500).json({ error: 'Failed to load platform configuration' });
+    }
+});
+
+/* Platform information endpoint */
+app.get('/api/platform/info', (req, res) => {
+    try {
+        const summary = configManager.getConfigSummary();
+        res.json(summary);
+    } catch (error) {
+        console.error('[Platform] Error serving platform info:', error);
+        res.status(500).json({ error: 'Failed to get platform information' });
+    }
+});
 
 /* Handle system information requests */
 app.get('/run-uname', (req, res) => {
@@ -112,18 +146,48 @@ app.get('/start-audio-classification', (req, res) => {
     const device = req.query.device || 'default';
 
     console.log('[Audio Classification] Starting with device:', device);
-    console.log('[Audio Classification] Device format:', {
-        raw: device,
-        isPlugHw: device.includes('plughw:'),
-        command: `/usr/bin/audio_utils start_gst "${device}"`
-    });
 
     if (audioProcess) {
         return res.status(400).send('Audio classification already running');
     }
 
+    // Get platform-specific configuration for audio classification
+    const audioConfig = configManager.getDemoConfig('audio-classification');
+    console.log('[Audio Classification] Using configuration:', audioConfig);
+
+    // Build command arguments based on platform configuration
+    const args = ['start_gst', device];
+
+    // Add model path if configured (will be passed as environment variable to audio_utils)
+    if (audioConfig.modelPath) {
+        process.env.AUDIO_MODEL_PATH = audioConfig.modelPath;
+    }
+
+    // Add labels path if configured
+    if (audioConfig.labelsPath) {
+        process.env.AUDIO_LABELS_PATH = audioConfig.labelsPath;
+    }
+
+    // Set GPU acceleration flag
+    if (audioConfig.enableGpuAcceleration) {
+        process.env.ENABLE_GPU_ACCEL = '1';
+    }
+
+    // Set AI accelerator flag (AM62D specific)
+    if (audioConfig.useAiAccelerator) {
+        process.env.USE_AI_ACCELERATOR = '1';
+    }
+
+    console.log('[Audio Classification] Device format:', {
+        raw: device,
+        isPlugHw: device.includes('plughw:'),
+        modelPath: audioConfig.modelPath,
+        gpuAccel: audioConfig.enableGpuAcceleration,
+        aiAccel: audioConfig.useAiAccelerator
+    });
+
     // Start the audio classification process
-    audioProcess = spawn('/usr/bin/audio_utils', ['start_gst', device]);
+    audioProcess = spawn('/usr/bin/audio_utils', args);
 
     audioProcess.on('error', (err) => {
         console.error('Failed to start audio classification:', err);
