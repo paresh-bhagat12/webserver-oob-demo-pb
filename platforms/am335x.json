@@ -36,7 +36,7 @@
     "tiBrandingEnabled": true
   },
   "demos": {
-    "enabled": ["home", "audio-classification", "cpu-performance", "documentation"],
+    "enabled": ["system-info", "audio-classification", "cpu-performance"],
     "configurations": {
       "audio-classification": {
         "modelPath": "/usr/share/oob-demo-assets/models/yamnet_audio_classification.tflite",

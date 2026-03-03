@@ -51,8 +51,8 @@ typedef struct {
 audio_device_info audio_devices[MAX_DEVICES];
 int device_count = 0;
 char *g_selected_device = NULL;
-char fifo_path[256] = "/tmp/audio_classification_fifo";
-char pid_file[256] = "/tmp/audio_classification.pid";
+char fifo_path[256];
+char pid_file[256];
 volatile int running = 0;
 
 // Signal handler for graceful shutdown
@@ -61,6 +61,39 @@ void signal_handler(int signum) {
         fprintf(stderr, "Received signal %d, stopping audio classification\n", signum);
         running = 0;
     }
+}
+
+// Initialize configurable paths with environment variables or defaults
+void init_audio_config() {
+    // Initialize FIFO path
+    const char *fifo_env = getenv("AUDIO_FIFO_PATH");
+    if (fifo_env) {
+        strncpy(fifo_path, fifo_env, sizeof(fifo_path) - 1);
+        fifo_path[sizeof(fifo_path) - 1] = '\0';
+    } else {
+        strcpy(fifo_path, "/tmp/audio_classification_fifo");
+    }
+
+    // Initialize PID file path
+    const char *pid_env = getenv("AUDIO_PID_FILE");
+    if (pid_env) {
+        strncpy(pid_file, pid_env, sizeof(pid_file) - 1);
+        pid_file[sizeof(pid_file) - 1] = '\0';
+    } else {
+        strcpy(pid_file, "/tmp/audio_classification.pid");
+    }
+}
+
+// Get model path from environment or default
+const char* get_model_path() {
+    const char *model_path = getenv("AUDIO_MODEL_PATH");
+    return model_path ? model_path : "/usr/share/oob-demo-assets/models/yamnet_audio_classification.tflite";
+}
+
+// Get labels path from environment or default
+const char* get_labels_path() {
+    const char *labels_path = getenv("AUDIO_LABELS_PATH");
+    return labels_path ? labels_path : "/usr/share/oob-demo-assets/labels/yamnet_label_list.txt";
 }
 
 // Get list of audio recording devices
@@ -198,10 +231,10 @@ void* gst_launch_thread(void *arg) {
              "tensor_transform mode=arithmetic option=typecast:float32,add:0.5,div:32767.5 ! "
              "tensor_transform mode=transpose option=1:0:2:3 ! "
              "queue leaky=2 max-size-buffers=10 ! "
-             "tensor_filter framework=tensorflow2-lite model=/usr/share/oob-demo-assets/models/yamnet_audio_classification.tflite custom=Delegate:XNNPACK,NumThreads:2 ! "
-             "tensor_decoder mode=image_labeling option1=/usr/share/oob-demo-assets/labels/yamnet_label_list.txt ! "
+             "tensor_filter framework=tensorflow2-lite model=%s custom=Delegate:XNNPACK,NumThreads:2 ! "
+             "tensor_decoder mode=image_labeling option1=%s ! "
              "filesink buffer-mode=2 location=%s 2>/dev/null",
-             device, fifo_path);
+             device, get_model_path(), get_labels_path(), fifo_path);
 
     fprintf(stderr, "Starting GStreamer with device: %s\n", device);
 
@@ -282,6 +315,9 @@ void* gst_launch_thread(void *arg) {
 
 // Main function for testing or direct execution
 int main(int argc, char *argv[]) {
+    // Initialize configurable paths from environment variables
+    init_audio_config();
+
     if (argc > 1 && strcmp(argv[1], "devices") == 0) {
         char *devices = get_arecord_devices();
         if (devices) {

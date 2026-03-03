@@ -107,6 +107,9 @@ class PlatformBuilder {
     updatePlatformFiles(outputDir, platformConfig) {
         console.log('Updating platform-specific files...');
 
+        // Process HTML templates
+        this.processHtmlTemplates(outputDir, platformConfig);
+
         // Update package.json
         this.updatePackageJson(outputDir, platformConfig);
 
@@ -118,6 +121,114 @@ class PlatformBuilder {
 
         // Create platform config file in output
         this.createPlatformConfigFile(outputDir, platformConfig);
+    }
+
+    // Process HTML template files
+    processHtmlTemplates(outputDir, platformConfig) {
+        console.log('Processing HTML templates...');
+
+        const templatesDir = path.join(outputDir, 'webserver_app/templates');
+        const appDir = path.join(outputDir, 'webserver_app/app');
+
+        if (!fs.existsSync(templatesDir)) {
+            console.log('No templates directory found, skipping template processing');
+            return;
+        }
+
+        // Find all template files
+        const templateFiles = this.findTemplateFiles(templatesDir);
+
+        templateFiles.forEach(templateFile => {
+            try {
+                // Read template content
+                const templatePath = path.join(templatesDir, templateFile);
+                let content = fs.readFileSync(templatePath, 'utf8');
+
+                // Replace placeholders with platform config values
+                content = this.replacePlaceholders(content, platformConfig);
+
+                // Write processed file to app directory (remove .template extension)
+                const outputFile = templateFile.replace('.template', '');
+                const outputPath = path.join(outputDir, 'webserver_app', outputFile);
+
+                // Ensure output directory exists
+                const outputFileDir = path.dirname(outputPath);
+                fs.mkdirSync(outputFileDir, { recursive: true });
+
+                fs.writeFileSync(outputPath, content);
+                console.log(`Processed template: ${templateFile} -> ${outputFile}`);
+
+            } catch (error) {
+                console.error(`Error processing template ${templateFile}:`, error.message);
+            }
+        });
+    }
+
+    // Find all template files recursively
+    findTemplateFiles(dir, prefix = '') {
+        const files = [];
+        const items = fs.readdirSync(dir);
+
+        items.forEach(item => {
+            const fullPath = path.join(dir, item);
+            const relativePath = prefix ? path.join(prefix, item) : item;
+
+            if (fs.statSync(fullPath).isDirectory()) {
+                files.push(...this.findTemplateFiles(fullPath, relativePath));
+            } else if (item.endsWith('.template')) {
+                files.push(relativePath);
+            }
+        });
+
+        return files;
+    }
+
+    // Replace template placeholders with platform config values
+    replacePlaceholders(content, platformConfig) {
+        // Extract platform data for easy access
+        const platform = platformConfig.platform;
+        const branding = platformConfig.branding;
+        const boards = platformConfig.boards || [];
+        const docs = platformConfig.documentation?.sections || [];
+        const quickLinks = platformConfig.documentation?.quickLinks || [];
+
+        // Define placeholder mappings
+        const replacements = {
+            // Platform information
+            'PLATFORM_TITLE': platform.title,
+            'PLATFORM_DISPLAY_NAME': platform.displayName,
+            'PLATFORM_HEADER_DESCRIPTION': branding.headerDescription,
+
+            // Board information
+            'BOARD_1_IMAGE': boards[0]?.image || '',
+            'BOARD_1_NAME': boards[0]?.name || '',
+            'BOARD_1_DESCRIPTION': boards[0]?.description || '',
+            'BOARD_2_IMAGE': boards[1]?.image || '',
+            'BOARD_2_NAME': boards[1]?.name || '',
+            'BOARD_2_DESCRIPTION': boards[1]?.description || '',
+
+            // Documentation links
+            'DOC_PRODUCT_URL': docs.find(d => d.title === 'Product Page')?.url || '',
+            'DOC_PRODUCT_DESCRIPTION': docs.find(d => d.title === 'Product Page')?.description || '',
+            'DOC_TRM_URL': docs.find(d => d.title === 'Technical Reference Manual')?.url || '',
+            'DOC_TRM_DESCRIPTION': docs.find(d => d.title === 'Technical Reference Manual')?.description || '',
+            'DOC_SDK_URL': docs.find(d => d.title === 'Processor SDK')?.url || '',
+            'DOC_GETTING_STARTED_URL': docs.find(d => d.title === 'Getting Started')?.url || '',
+
+            // Quick links
+            'QUICK_LINK_DATASHEET_URL': quickLinks.find(q => q.text === 'Datasheet')?.url || '',
+            'QUICK_LINK_GITHUB_URL': quickLinks.find(q => q.text.includes('GitHub'))?.url || '',
+            'QUICK_LINK_GITHUB_TEXT': quickLinks.find(q => q.text.includes('GitHub'))?.text || 'GitHub'
+        };
+
+        // Replace all placeholders
+        let processedContent = content;
+        Object.entries(replacements).forEach(([placeholder, value]) => {
+            const regex = new RegExp(`\\{\\{${placeholder}\\}\\}`, 'g');
+            processedContent = processedContent.replace(regex, value);
+        });
+
+        return processedContent;
     }
 
     // Update package.json with platform-specific information

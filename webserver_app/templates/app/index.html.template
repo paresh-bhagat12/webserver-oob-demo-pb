@@ -31,7 +31,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <link rel="icon" type="image/png" href="splash/gui_icon.png">
 
-    <title>AM335x Demo</title>
+    <title>{{PLATFORM_TITLE}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <script src="components/webcomponentsjs/webcomponents-lite.js"></script>
@@ -2084,7 +2084,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <ti-widget-readme background-color="#ffffff" elevation="5" title-text="README.md" id="readmeViewer" pin></ti-widget-readme>
 <ti-core-stylesheets id="ti_core_stylesheets"></ti-core-stylesheets>
 
-<ti-widget-menubar id="ti_widget_menubar" layout class="x-scope ti-widget-menubar-0" horizontal pin product-name="AM335x Demo">
+<ti-widget-menubar id="ti_widget_menubar" layout class="x-scope ti-widget-menubar-0" horizontal pin product-name="{{PLATFORM_TITLE}}">
 
 
     <ti-widget-menuitem name="Tools" id="ti_widget_menuitem_tools" layout>
@@ -2109,17 +2109,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <ti-widget-vtabcontainer id="ti_widget_vtabcontainer" vtab-height-in-px="60" selected-index="0" ink-color="#f1f1f1" color-selected="#ffffff" color-unselected="#888" color-disabled="#ccc" color-selection-bar="white" background-color-selected="#148c9c" background-color-hover="#dcdcec" auto-expand auto-zero-htab-index tab-height-in-px="60" vertical layout>
     <ti-widget-vtab id="ti_widget_vtab_home" name="Home" icon="home" icon-style="width:30px;height:30px;padding:5px;" visible no-child-tabs-in-menu font-size="inherit" auto-scroll font-style="normal" font-weight="normal" text-align="left" text-decoration="none" autoscroll title vertical layout>
-        <ti-widget-label id="ti_widget_label_productname" label="AM335X" text-align="center" font-size="custom" custom-font-size="32px" font-color="#ffffff" font-style="normal" font-weight="normal" text-decoration="none" visible></ti-widget-label>
+        <ti-widget-label id="ti_widget_label_productname" label="{{PLATFORM_DISPLAY_NAME}}" text-align="center" font-size="custom" custom-font-size="32px" font-color="#ffffff" font-style="normal" font-weight="normal" text-decoration="none" visible></ti-widget-label>
         <ti-widget-label id="ti_widget_label_productdesc" label="Analyze system performance, review documentation, and run demos" text-align="center" font-size="custom" font-color="#ffffff" font-style="normal" font-weight="normal" text-decoration="none" visible></ti-widget-label>
 
         <div class="carousel-container">
             <div class="carousel-slide active">
-                <ti-widget-image image-path="images/beagl-bone-grn-eco-angled.png" lock-aspect-ratio hover-effect="no" visible lockaspectratio center-justified horizontal layout center></ti-widget-image>
-                <ti-widget-label label="BeagleBone Green Eco: A low-cost, industrial-grade open-source hardware platform for commercial and industrial applications." text-align="center" font-size="medium"></ti-widget-label>
+                <ti-widget-image image-path="{{BOARD_1_IMAGE}}" lock-aspect-ratio hover-effect="no" visible lockaspectratio center-justified horizontal layout center></ti-widget-image>
+                <ti-widget-label label="{{BOARD_1_NAME}}: {{BOARD_1_DESCRIPTION}}" text-align="center" font-size="medium"></ti-widget-label>
             </div>
             <div class="carousel-slide">
-                <ti-widget-image image-path="images/tmdxevm3358-angled.png" lock-aspect-ratio hover-effect="no" visible lockaspectratio center-justified horizontal layout center></ti-widget-image>
-                <ti-widget-label label="AM335x Evaluation Module: Comprehensive development platform for AM335x processors." text-align="center" font-size="medium"></ti-widget-label>
+                <ti-widget-image image-path="{{BOARD_2_IMAGE}}" lock-aspect-ratio hover-effect="no" visible lockaspectratio center-justified horizontal layout center></ti-widget-image>
+                <ti-widget-label label="{{BOARD_2_NAME}}: {{BOARD_2_DESCRIPTION}}" text-align="center" font-size="medium"></ti-widget-label>
             </div>
         </div>
         <div class="carousel-dots">
@@ -2930,11 +2930,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div class="docs-container">
             <div class="docs-header">
                 <h1>Documentation & <span>Resources</span></h1>
-                <p>Everything you need to develop with AM335x Sitara processors</p>
+                <p>{{PLATFORM_HEADER_DESCRIPTION}}</p>
             </div>
 
             <div class="docs-grid">
-                <div class="doc-card" onclick="window.open('https://www.ti.com/product/AM3358', '_blank')">
+                <div class="doc-card" onclick="window.open('{{DOC_PRODUCT_URL}}', '_blank')">
                     <div class="doc-card-header">
                         <div class="doc-card-icon">
                             <ti-widget-icon icon="hardware:developer_board" icon-size="24" icon-color="#666"></ti-widget-icon>
@@ -2942,17 +2942,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         <h3>Product Page</h3>
                     </div>
                     <p class="doc-card-description">
-                        Explore specifications, features, and ordering information for the AM335x Sitara processor family
+{{DOC_PRODUCT_DESCRIPTION}}
                     </p>
                     <div class="doc-card-footer">
-                        <a href="https://www.ti.com/product/AM3358" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                        <a href="{{DOC_PRODUCT_URL}}" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
                             View Product
                         </a>
                         <span class="doc-card-badge">Official</span>
                     </div>
                 </div>
 
-                <div class="doc-card" onclick="window.open('https://www.ti.com/lit/ug/spruh73p/spruh73p.pdf', '_blank')">
+                <div class="doc-card" onclick="window.open('{{DOC_TRM_URL}}', '_blank')">
                     <div class="doc-card-header">
                         <div class="doc-card-icon">
                             <ti-widget-icon icon="action:book" icon-size="24" icon-color="#666"></ti-widget-icon>
@@ -2960,17 +2960,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         <h3>Technical Reference Manual</h3>
                     </div>
                     <p class="doc-card-description">
-                        Complete technical documentation covering all AM335x subsystems, peripherals, and registers
+                        {{DOC_TRM_DESCRIPTION}}
                     </p>
                     <div class="doc-card-footer">
-                        <a href="https://www.ti.com/lit/ug/spruh73p/spruh73p.pdf" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                        <a href="{{DOC_TRM_URL}}" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
                             Download PDF
                         </a>
                         <span class="doc-card-badge">4000+ pages</span>
                     </div>
                 </div>
 
-                <div class="doc-card" onclick="window.open('https://www.ti.com/tool/PROCESSOR-SDK-AM335X', '_blank')">
+                <div class="doc-card" onclick="window.open('{{DOC_SDK_URL}}', '_blank')">
                     <div class="doc-card-header">
                         <div class="doc-card-icon">
                             <ti-widget-icon icon="file:folder" icon-size="24" icon-color="#666"></ti-widget-icon>
@@ -2981,14 +2981,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         Linux development kit with drivers, libraries, and ready-to-run example applications
                     </p>
                     <div class="doc-card-footer">
-                        <a href="https://www.ti.com/tool/PROCESSOR-SDK-AM335X" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                        <a href="{{DOC_SDK_URL}}" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
                             Get SDK
                         </a>
                         <span class="doc-card-badge">Latest</span>
                     </div>
                 </div>
 
-                <div class="doc-card" onclick="window.open('https://software-dl.ti.com/processor-sdk-linux/esd/AM335X/latest/exports/docs/linux/Overview/Processor_SDK_Linux_Getting_Started_Guide.html', '_blank')">
+                <div class="doc-card" onclick="window.open('{{DOC_GETTING_STARTED_URL}}', '_blank')">
                     <div class="doc-card-header">
                         <div class="doc-card-icon">
                             <ti-widget-icon icon="action:article" icon-size="24" icon-color="#666"></ti-widget-icon>
@@ -2999,7 +2999,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         Step-by-step guides for SDK installation, building applications, and deployment
                     </p>
                     <div class="doc-card-footer">
-                        <a href="https://software-dl.ti.com/processor-sdk-linux/esd/AM335X/latest/exports/docs/linux/Overview/Processor_SDK_Linux_Getting_Started_Guide.html" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
+                        <a href="{{DOC_GETTING_STARTED_URL}}" target="_blank" class="doc-card-link" onclick="event.stopPropagation()">
                             Browse Docs
                         </a>
                         <span class="doc-card-badge">Guides</span>
@@ -3028,17 +3028,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <div class="quick-links">
                 <h2>Additional Resources</h2>
                 <div class="quick-links-grid">
-                    <a href="https://www.ti.com/lit/ds/symlink/am3358.pdf" target="_blank" class="quick-link">
+                    <a href="{{QUICK_LINK_DATASHEET_URL}}" target="_blank" class="quick-link">
                         <span class="quick-link-icon">
                             <ti-widget-icon icon="action:description" icon-size="16" icon-color="#666"></ti-widget-icon>
                         </span>
                         <span class="quick-link-text">Datasheet</span>
                     </a>
-                    <a href="https://github.com/beagleboard" target="_blank" class="quick-link">
+                    <a href="{{QUICK_LINK_GITHUB_URL}}" target="_blank" class="quick-link">
                         <span class="quick-link-icon">
                             <ti-widget-icon icon="action:code" icon-size="16" icon-color="#666"></ti-widget-icon>
                         </span>
-                        <span class="quick-link-text">BeagleBoard GitHub</span>
+                        <span class="quick-link-text">{{QUICK_LINK_GITHUB_TEXT}}</span>
                     </a>
                     <a href="https://www.ti.com/tool/CCSTUDIO" target="_blank" class="quick-link">
                         <span class="quick-link-icon">

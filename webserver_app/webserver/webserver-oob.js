@@ -168,6 +168,9 @@ app.get('/start-audio-classification', (req, res) => {
         process.env.AUDIO_LABELS_PATH = audioConfig.labelsPath;
     }
 
+    // Set FIFO path for consistent communication between processes
+    process.env.AUDIO_FIFO_PATH = '/tmp/audio_classification_fifo';
+
     // Set GPU acceleration flag
     if (audioConfig.enableGpuAcceleration) {
         process.env.ENABLE_GPU_ACCEL = '1';

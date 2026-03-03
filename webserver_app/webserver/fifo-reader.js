@@ -9,7 +9,7 @@
 const fs = require('fs');
 const readline = require('readline');
 
-const fifoPath = '/tmp/audio_classification_fifo';
+const fifoPath = process.env.AUDIO_FIFO_PATH || '/tmp/audio_classification_fifo';
 
 // Setup stdout to send messages to parent process
 process.stdout.write(JSON.stringify({
