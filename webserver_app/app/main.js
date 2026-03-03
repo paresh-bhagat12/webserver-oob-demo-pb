@@ -56,6 +56,73 @@ document.addEventListener('gc-nav-ready', function() {
 
 var initComplete = false;
 var templateObj;
+var platformConfig = null;
+
+// Load platform configuration from backend
+function loadPlatformConfiguration() {
+    console.log("[Platform] Loading platform configuration...");
+
+    fetch('/api/platform/config')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(config => {
+            platformConfig = config;
+            console.log("[Platform] Loaded configuration for:", config.platform.name);
+            console.log("[Platform] Configuration:", config);
+
+            // Update dynamic platform elements
+            updatePlatformElements(config);
+
+            // Log platform info
+            if (templateObj.$.ti_widget_eventlog_view) {
+                templateObj.$.ti_widget_eventlog_view.log("info", `Platform: ${config.platform.name} (${config.platform.title})`);
+            }
+        })
+        .catch(error => {
+            console.error("[Platform] Failed to load configuration:", error);
+            // Continue with default behavior
+            if (templateObj.$.ti_widget_eventlog_view) {
+                templateObj.$.ti_widget_eventlog_view.log("warning", "Using default platform configuration");
+            }
+        });
+}
+
+// Update platform-specific UI elements
+function updatePlatformElements(config) {
+    console.log("[Platform] Updating UI elements with platform configuration");
+
+    try {
+        // Update page title if possible
+        if (config.platform.title) {
+            document.title = config.platform.title;
+        }
+
+        // Update any platform-specific labels or content
+        // (For now, we keep this minimal and don't change major UI structure)
+
+        // Log enabled demos
+        if (config.demos && config.demos.enabled) {
+            console.log("[Platform] Enabled demos:", config.demos.enabled.join(", "));
+        }
+
+        // Log board information
+        if (config.boards && config.boards.length > 0) {
+            console.log("[Platform] Available boards:", config.boards.map(b => b.name).join(", "));
+        }
+
+    } catch (error) {
+        console.error("[Platform] Error updating platform elements:", error);
+    }
+}
+
+// Get platform configuration (utility function for other components)
+function getPlatformConfig() {
+    return platformConfig;
+}
 
 
 // Wait for DOMContentLoaded event before trying to access the application template
@@ -73,6 +140,9 @@ var init = function() {
             console.log("Application template has been stamped.");
             templateObj.$.ti_widget_toast.hideToast();
             templateObj.$.ti_widget_eventlog_view.log("info", "Application started.");
+
+            // Load platform configuration
+            loadPlatformConfiguration();
 
             // Expand vtabcontainer nav bar when user clicks on menu icon or 'Menu' label
             templateObj.toggleMenu = function(event){
