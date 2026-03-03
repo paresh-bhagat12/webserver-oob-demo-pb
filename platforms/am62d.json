@@ -1,0 +1,128 @@
+{
+  "platform": {
+    "name": "AM62D",
+    "displayName": "AM62D",
+    "family": "Sitara AM62D",
+    "title": "AM62D Demo",
+    "description": "Explore edge AI capabilities, system performance, and documentation",
+    "productPage": "https://www.ti.com/product/AM62D"
+  },
+  "branding": {
+    "applicationName": "AM62D Demo",
+    "projectName": "AM62D_Demo",
+    "template": "AM62D Demo",
+    "menubarProductName": "AM62D Demo",
+    "serviceDescription": "AM62D OOB Demo Webserver",
+    "packageDescription": "Webserver for the AM62D OOB Demo",
+    "headerDescription": "Everything you need to develop with AM62D Sitara processors"
+  },
+  "boards": [
+    {
+      "id": "am62d-sk",
+      "name": "AM62D Starter Kit",
+      "description": "Complete development platform with integrated display and edge AI acceleration.",
+      "image": "images/am62d-sk-angled.png"
+    }
+  ],
+  "theme": {
+    "name": "ti-analogevm-theme",
+    "primaryColor": "#148C9C",
+    "tiBrandingEnabled": true
+  },
+  "demos": {
+    "enabled": ["home", "audio-classification", "cpu-performance", "custom-demo", "documentation"],
+    "configurations": {
+      "audio-classification": {
+        "modelPath": "/usr/share/oob-demo-assets/models/yamnet_optimized_am62d.tflite",
+        "labelsPath": "/usr/share/oob-demo-assets/labels/yamnet_label_list.txt",
+        "enableGpuAcceleration": true,
+        "useAiAccelerator": true
+      },
+      "cpu-performance": {
+        "refreshInterval": 1000,
+        "historyLength": 60
+      },
+      "custom-demo": {
+        "type": "placeholder-for-your-custom-demo",
+        "title": "Custom Demo",
+        "description": "Custom demo specific to AM62D - specify requirements",
+        "enabled": true
+      }
+    }
+  },
+  "documentation": {
+    "sections": [
+      {
+        "title": "Product Page",
+        "description": "Explore specifications, features, and ordering information for the AM62D Sitara processor",
+        "url": "https://www.ti.com/product/AM62D",
+        "icon": "hardware:developer_board",
+        "linkText": "View Product",
+        "badge": "Official"
+      },
+      {
+        "title": "Technical Reference Manual",
+        "description": "Complete technical documentation covering all AM62D subsystems, peripherals, and registers",
+        "url": "https://www.ti.com/lit/pdf/spruiv7",
+        "icon": "action:book",
+        "linkText": "Download PDF",
+        "badge": "Latest"
+      },
+      {
+        "title": "Processor SDK",
+        "description": "Linux development kit with AI/ML tools, drivers, and example applications",
+        "url": "https://www.ti.com/tool/PROCESSOR-SDK-AM62A",
+        "icon": "file:folder",
+        "linkText": "Get SDK",
+        "badge": "Latest"
+      },
+      {
+        "title": "Edge AI Documentation",
+        "description": "Comprehensive guides for developing edge AI applications on AM62D",
+        "url": "https://www.ti.com/edgeai",
+        "icon": "action:explore",
+        "linkText": "Explore AI",
+        "badge": "AI/ML"
+      },
+      {
+        "title": "Community Forum",
+        "description": "Get help from TI engineers and connect with thousands of embedded developers",
+        "url": "https://e2e.ti.com/support/processors/",
+        "icon": "communication:forum",
+        "linkText": "Join Discussion",
+        "badge": "Active"
+      }
+    ],
+    "quickLinks": [
+      {
+        "text": "Datasheet",
+        "url": "https://www.ti.com/lit/ds/symlink/am62d.pdf",
+        "icon": "action:description"
+      },
+      {
+        "text": "Edge AI Documentation",
+        "url": "https://www.ti.com/edgeai",
+        "icon": "action:explore"
+      },
+      {
+        "text": "Code Composer Studio",
+        "url": "https://www.ti.com/tool/CCSTUDIO",
+        "icon": "action:build"
+      },
+      {
+        "text": "TI Resource Explorer",
+        "url": "https://dev.ti.com/tirex/",
+        "icon": "action:explore"
+      },
+      {
+        "text": "SysConfig Tool",
+        "url": "https://www.ti.com/tool/SYSCONFIG",
+        "icon": "action:settings"
+      }
+    ]
+  },
+  "build": {
+    "outputDir": "dist/am62d",
+    "packageName": "webserver-oob-am62d"
+  }
+}
