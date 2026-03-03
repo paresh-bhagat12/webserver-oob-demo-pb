@@ -28,3 +28,6 @@ Thumbs.db
 # Backup files
 *.bak
 *.backup
+
+# Generated platform packages
+dist/
